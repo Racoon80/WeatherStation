@@ -1,0 +1,14 @@
+# OS
+.DS_Store
+
+# Editor swap/backup
+*~
+*.swp
+*.swo
+*.tmp
+
+# Logs
+*.log
+
+# Env files
+.env
