@@ -162,6 +162,32 @@ app.get("/api/weather", async (req, res) => {
   }
 });
 
+app.get("/api/airquality", async (req, res) => {
+  try {
+    if (!apiKey) {
+      return res.status(500).json({ error: "Missing OPENWEATHER_API_KEY" });
+    }
+    const lat = Number(req.query.lat);
+    const lon = Number(req.query.lon);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+      return res.status(400).json({ error: "Missing lat/lon" });
+    }
+    const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+    const resp = await fetch(url);
+    if (!resp.ok) {
+      return res.status(resp.status).json({ error: "Air quality fetch failed" });
+    }
+    const data = await resp.json();
+    const current = data.list?.[0];
+    res.json({
+      aqi: current?.main?.aqi ?? null,
+      components: current?.components || {}
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Unexpected server error" });
+  }
+});
+
 const parseICalDate = (value) => {
   if (!value) return null;
   const cleaned = value.replace("Z", "");

@@ -198,6 +198,17 @@ body {
   font-size: 1.1rem;
 }
 
+.airquality {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.airquality span {
+  color: rgba(11, 31, 42, 0.7);
+}
+
 .wind-map {
   position: relative;
   width: 100%;

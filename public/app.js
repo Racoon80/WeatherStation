@@ -3,6 +3,7 @@ const locationName = document.getElementById("locationName");
 const latEl = document.getElementById("lat");
 const lonEl = document.getElementById("lon");
 const countryEl = document.getElementById("country");
+const airQualityEl = document.getElementById("airQuality");
 const windDir = document.getElementById("windDir");
 const windSpeed = document.getElementById("windSpeed");
 const forecastEl = document.getElementById("forecast");
@@ -200,6 +201,29 @@ const updateUI = (data) => {
   }
 };
 
+const loadAirQuality = async (lat, lon) => {
+  const response = await fetch(
+    `/api/airquality?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(
+      lon
+    )}`
+  );
+  if (!response.ok) {
+    throw new Error("Failed to load air quality");
+  }
+  return response.json();
+};
+
+const renderAirQuality = (data) => {
+  if (!airQualityEl) return;
+  if (!data || data.aqi === null) {
+    airQualityEl.textContent = "--";
+    return;
+  }
+  const labels = ["Good", "Fair", "Moderate", "Poor", "Very poor"];
+  const label = labels[data.aqi - 1] || "Unknown";
+  airQualityEl.textContent = `${label} (AQI ${data.aqi})`;
+};
+
 const loadWeather = async (city, country) => {
   const params = new URLSearchParams();
   if (city) params.set("city", city);
@@ -285,9 +309,14 @@ form.addEventListener("submit", async (event) => {
   try {
     const data = await loadWeather();
     updateUI(data);
+    const air = await loadAirQuality(data.location.lat, data.location.lon);
+    renderAirQuality(air);
     loadCalendar();
   } catch (error) {
     forecastEl.textContent = "Unable to load data. Check the API key.";
+    if (airQualityEl) {
+      airQualityEl.textContent = "--";
+    }
     loadCalendar();
   }
 })();
