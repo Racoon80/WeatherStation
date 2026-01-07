@@ -314,6 +314,7 @@ h1 {
 .forecast-tile img {
   width: 52px;
   height: 52px;
+  filter: saturate(1.6) contrast(1.2) drop-shadow(0 6px 10px rgba(0, 0, 0, 0.12));
 }
 
 .temp-range {
