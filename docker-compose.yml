@@ -5,9 +5,9 @@ services:
       - "3001:3001"
     environment:
       # Set your OpenWeatherMap API key here.
-      OPENWEATHER_API_KEY: "your_api_key_here"
-      DEFAULT_CITY: "Luxembourg"
-      DEFAULT_COUNTRY: "LU"
+      - OPENWEATHER_API_KEY=your_api_key_here
+      - DEFAULT_CITY=Luxembourg
+      - DEFAULT_COUNTRY=LU
     healthcheck:
       test:
         [
