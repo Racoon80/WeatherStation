@@ -1,14 +1,14 @@
 # WeatherStation
 
 Dockerized weather station that pulls data from OpenWeatherMap and renders a
-single-page dashboard with the current position, wind direction, and a 7-day
+single-page dashboard with the current position, wind direction, and a 6-day
 forecast.
 
 ## Features
 - OpenWeatherMap geocoding + One Call 3.0 API
 - Current position (lat/lon + country)
 - Wind direction compass and speed
-- 7-day forecast summary
+- 6-day forecast summary
 
 ## Requirements
 - OpenWeatherMap API key with access to the One Call 3.0 endpoint
@@ -26,9 +26,34 @@ docker compose -f /mnt/user/appdata/COMPOSE/WeatherStation/docker-compose.yml up
 
 ## Docker Compose file
 
-The compose file lives outside the repo at:
-
-`/mnt/user/appdata/COMPOSE/WeatherStation/docker-compose.yml`
+```yaml
+services:
+  weatherstation:
+    image: ghcr.io/racoon80/weatherstation:latest
+    restart: always
+    ports:
+      - "3001:3001"
+    environment:
+      # Set your OpenWeatherMap API key here.
+      - OPENWEATHER_API_KEY=your_api_key_here
+      - DEFAULT_CITY=Luxembourg
+      - DEFAULT_COUNTRY=LU
+      - WINDY_API_KEY=your_windy_key_here
+      - WINDY_ZOOM=6
+      - WINDY_SHOWLAYER=rain
+      - ICAL_URL=your_ical_url_here
+      - MAXIMUM_ENTRIES=8
+    volumes:
+      - /mnt/user/appdata/WeatherStation:/app/config
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"fetch('http://localhost:3001/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
 3. Open `http://localhost:3001`
 
@@ -64,4 +89,4 @@ mapped to that host path) and put the key on a single line.
 
 ## Notes
 - The forecast uses the free 5-day/3-hour endpoint and summarizes it into a
-  daily view. If fewer than 7 days are available, placeholders fill the rest.
+  daily view. If fewer than 6 days are available, placeholders fill the rest.
