@@ -51,5 +51,5 @@ You can store an OpenWeatherMap API key in the browser at `/settings.html`. The
 dashboard will send that key with each request, overriding the server default.
 
 ## Notes
-- The 7-day forecast uses OpenWeatherMap One Call 2.5 to avoid paid-tier
-  requirements.
+- The forecast uses the free 5-day/3-hour endpoint and summarizes it into a
+  daily view. If fewer than 7 days are available, placeholders fill the rest.

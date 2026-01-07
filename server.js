@@ -59,13 +59,80 @@ app.get("/api/weather", async (req, res) => {
     const lat = loc.lat;
     const lon = loc.lon;
 
-    const oneCallUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,alerts&units=metric&appid=${activeKey}`;
-    const weatherResp = await fetch(oneCallUrl);
-    if (!weatherResp.ok) {
-      return res.status(weatherResp.status).json({ error: "Weather fetch failed" });
+    const currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${activeKey}`;
+    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${activeKey}`;
+
+    const [currentResp, forecastResp] = await Promise.all([
+      fetch(currentUrl),
+      fetch(forecastUrl)
+    ]);
+
+    if (!currentResp.ok) {
+      return res
+        .status(currentResp.status)
+        .json({ error: "Current weather fetch failed" });
+    }
+    if (!forecastResp.ok) {
+      return res
+        .status(forecastResp.status)
+        .json({ error: "Forecast fetch failed" });
     }
 
-    const weather = await weatherResp.json();
+    const current = await currentResp.json();
+    const forecast = await forecastResp.json();
+
+    const timezoneOffset = forecast.city?.timezone || 0;
+    const byDay = new Map();
+
+    for (const item of forecast.list || []) {
+      const localTs = (item.dt + timezoneOffset) * 1000;
+      const dayKey = new Date(localTs).toISOString().slice(0, 10);
+      const entry = byDay.get(dayKey) || {
+        dt: item.dt,
+        min: item.main.temp_min,
+        max: item.main.temp_max,
+        midday: null,
+        samples: []
+      };
+
+      entry.min = Math.min(entry.min, item.main.temp_min);
+      entry.max = Math.max(entry.max, item.main.temp_max);
+      entry.samples.push(item);
+
+      const hour = new Date(localTs).getUTCHours();
+      if (hour === 12) {
+        entry.midday = item;
+      }
+
+      byDay.set(dayKey, entry);
+    }
+
+    const daily = Array.from(byDay.values())
+      .sort((a, b) => a.dt - b.dt)
+      .slice(0, 7)
+      .map((entry) => {
+        const pick = entry.midday || entry.samples[0];
+        return {
+          dt: entry.dt,
+          temp: {
+            min: entry.min,
+            max: entry.max
+          },
+          weather: pick?.weather || []
+        };
+      });
+
+    if (daily.length < 7) {
+      const base = daily.length ? daily[daily.length - 1].dt : current.dt;
+      const startLen = daily.length;
+      for (let i = startLen; i < 7; i += 1) {
+        daily.push({
+          dt: base + 86400 * (i - startLen + 1),
+          temp: {},
+          weather: []
+        });
+      }
+    }
 
     res.json({
       location: {
@@ -74,8 +141,12 @@ app.get("/api/weather", async (req, res) => {
         lat,
         lon
       },
-      current: weather.current,
-      daily: weather.daily ? weather.daily.slice(0, 7) : []
+      current: {
+        dt: current.dt,
+        wind_speed: current.wind?.speed,
+        wind_deg: current.wind?.deg
+      },
+      daily
     });
   } catch (err) {
     res.status(500).json({ error: "Unexpected server error" });

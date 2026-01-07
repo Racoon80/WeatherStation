@@ -56,15 +56,19 @@ const renderForecast = (days) => {
     const iconUrl = icon
       ? `https://openweathermap.org/img/wn/${icon}@2x.png`
       : "";
+    const maxTemp =
+      typeof day.temp?.max === "number" ? Math.round(day.temp.max) : null;
+    const minTemp =
+      typeof day.temp?.min === "number" ? Math.round(day.temp.min) : null;
 
     tile.innerHTML = `
       <strong>${formatDay(day.dt)}</strong>
       ${iconUrl ? `<img src="${iconUrl}" alt="${desc}" />` : ""}
       <div class="temp-range">
-        <div>${Math.round(day.temp.max)}°</div>
-        <span>${Math.round(day.temp.min)}°</span>
+        <div>${maxTemp !== null ? `${maxTemp}°` : "--"}</div>
+        <span>${minTemp !== null ? `${minTemp}°` : "--"}</span>
       </div>
-      <small>${desc}</small>
+      <small>${desc || "No data"}</small>
     `;
 
     forecastEl.appendChild(tile);
