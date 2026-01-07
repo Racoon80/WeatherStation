@@ -85,7 +85,7 @@ const updateUI = (data) => {
   countryEl.textContent = data.location.country;
 
   const deg = data.current.wind_deg ?? 0;
-  windArrow.style.transform = `translateX(-50%) rotate(${deg}deg)`;
+  windArrow.style.transform = `translate(-50%, -50%) rotate(${deg}deg)`;
   windDir.textContent = `${directionLabel(deg)} (${deg}°)`;
   windSpeed.textContent = `${Math.round(data.current.wind_speed)} m/s`;
 
