@@ -53,8 +53,8 @@ body {
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  gap: 2.5rem;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
   align-items: start;
   position: relative;
   z-index: 1;
@@ -162,18 +162,21 @@ h1 {
 }
 
 .form-card {
-  grid-column: span 12;
+  grid-column: span 3;
 }
 
 .position-card {
-  grid-column: span 12;
+  grid-column: span 3;
   padding: 1.2rem;
 }
 
 .wind-card {
+  grid-column: span 6;
+  grid-row: span 2;
   display: grid;
   gap: 1.6rem;
   align-content: start;
+  min-height: 340px;
 }
 
 .location-name {
