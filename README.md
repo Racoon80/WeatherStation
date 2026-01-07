@@ -56,15 +56,6 @@ services:
       timeout: 5s
       retries: 3
 
-3. Open `http://localhost:3001`
-
-## Run locally
-
-```bash
-npm install
-OPENWEATHER_API_KEY=your_key_here npm start
-```
-
 ## Configuration
 
 Environment variables:
