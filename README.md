@@ -43,6 +43,11 @@ Environment variables:
 - `DEFAULT_CITY` (default: Luxembourg)
 - `DEFAULT_COUNTRY` (default: LU)
 
+## Settings page
+
+You can store an OpenWeatherMap API key in the browser at `/settings.html`. The
+dashboard will send that key with each request, overriding the server default.
+
 ## Notes
 - The 7-day forecast uses OpenWeatherMap One Call 3.0, which may require a paid
   plan depending on your account.

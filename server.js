@@ -16,7 +16,11 @@ app.get("/health", (_req, res) => {
 
 app.get("/api/weather", async (req, res) => {
   try {
-    if (!apiKey) {
+    const requestKey =
+      req.get("x-owm-key") || (req.query.apiKey || "").toString();
+    const activeKey = requestKey || apiKey;
+
+    if (!activeKey) {
       return res.status(500).json({ error: "Missing OPENWEATHER_API_KEY" });
     }
 
@@ -24,7 +28,7 @@ app.get("/api/weather", async (req, res) => {
     const country = (req.query.country || defaultCountry).toString();
     const query = encodeURIComponent(`${city},${country}`);
 
-    const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=1&appid=${apiKey}`;
+    const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=1&appid=${activeKey}`;
     const geoResp = await fetch(geoUrl);
     if (!geoResp.ok) {
       return res.status(geoResp.status).json({ error: "Geocoding failed" });
@@ -38,7 +42,7 @@ app.get("/api/weather", async (req, res) => {
     const lat = loc.lat;
     const lon = loc.lon;
 
-    const oneCallUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,alerts&units=metric&appid=${apiKey}`;
+    const oneCallUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,alerts&units=metric&appid=${activeKey}`;
     const weatherResp = await fetch(oneCallUrl);
     if (!weatherResp.ok) {
       return res.status(weatherResp.status).json({ error: "Weather fetch failed" });
