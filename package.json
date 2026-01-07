@@ -1,0 +1,12 @@
+{
+  "name": "weatherstation",
+  "version": "0.1.0",
+  "description": "Dockerized weather station with OpenWeatherMap",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
