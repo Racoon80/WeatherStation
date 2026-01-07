@@ -15,11 +15,7 @@ forecast.
 
 ## Run with Docker
 
-1. Copy the example env file and fill in your key:
-
-```bash
-cp .env.example .env
-```
+1. Edit `docker-compose.yml` and set `OPENWEATHER_API_KEY`.
 
 2. Start the container:
 
