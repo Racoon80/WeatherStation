@@ -51,55 +51,6 @@ body {
   z-index: 0;
 }
 
-.hero {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-  align-items: start;
-  position: relative;
-  z-index: 1;
-  margin-bottom: 3rem;
-  padding: 1.5rem;
-  border-radius: 1.5rem;
-  background: var(--surface);
-}
-
-.eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.25em;
-  font-size: 0.75rem;
-  color: var(--muted);
-  margin: 0 0 0.8rem;
-}
-
-h1 {
-  font-family: "Fraunces", serif;
-  font-size: clamp(2.5rem, 4vw, 4rem);
-  margin: 0 0 0.8rem;
-}
-
-.subhead {
-  margin: 0;
-  max-width: 36rem;
-  color: var(--muted);
-  font-size: 1.05rem;
-}
-
-.settings-link {
-  display: inline-flex;
-  margin-top: 1rem;
-  font-weight: 600;
-  color: var(--ink);
-  text-decoration: none;
-  border-bottom: 2px solid rgba(19, 19, 20, 0.2);
-  padding-bottom: 0.2rem;
-}
-
-.settings-link:hover {
-  color: var(--accent-dark);
-  border-bottom-color: var(--accent);
-}
-
 .location-form {
   display: grid;
   gap: 1rem;

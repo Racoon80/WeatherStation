@@ -208,11 +208,6 @@ const loadWeather = async (city, country) => {
   if (lang) params.set("lang", lang);
 
   const headers = {};
-  const storedKey = localStorage.getItem("owmApiKey");
-  if (storedKey) {
-    headers["x-owm-key"] = storedKey;
-  }
-
   const response = await fetch(`/api/weather?${params.toString()}`, {
     headers
   });

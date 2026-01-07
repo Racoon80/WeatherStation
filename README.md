@@ -58,11 +58,6 @@ If you don't want to set the key in `docker-compose.yml`, create a file at
 `/mnt/user/appdata/WeatherStation/openweather.key` (because `/app/config` is
 mapped to that host path) and put the key on a single line.
 
-## Settings page
-
-You can store an OpenWeatherMap API key in the browser at `/settings.html`. The
-dashboard will send that key with each request, overriding the server default.
-
 ## Notes
 - The forecast uses the free 5-day/3-hour endpoint and summarizes it into a
   daily view. If fewer than 7 days are available, placeholders fill the rest.
