@@ -16,13 +16,19 @@ forecast.
 ## Run with Docker
 
 1. Edit `/mnt/user/appdata/COMPOSE/WeatherStation/docker-compose.yml` and set
-   `OPENWEATHER_API_KEY`.
+   `OPENWEATHER_API_KEY`, `WINDY_API_KEY`, and (optionally) `WINDY_ZOOM`.
 
 2. Start the container:
 
 ```bash
 docker compose -f /mnt/user/appdata/COMPOSE/WeatherStation/docker-compose.yml up --build
 ```
+
+## Docker Compose file
+
+The compose file lives outside the repo at:
+
+`/mnt/user/appdata/COMPOSE/WeatherStation/docker-compose.yml`
 
 3. Open `http://localhost:3001`
 
@@ -45,6 +51,8 @@ Environment variables:
 - `WINDY_ROTATELAYERS` (default: `false`)
 - `WINDY_LAYERSTOROTATE` (default: empty)
 - `WINDY_DELAYROTATE` (default: empty, in milliseconds)
+- `ICAL_URL` (required for calendar events)
+- `MAXIMUM_ENTRIES` (default: `10`)
 
 If you don't want to set the key in `docker-compose.yml`, create a file at
 `/mnt/user/appdata/WeatherStation/openweather.key` (because `/app/config` is

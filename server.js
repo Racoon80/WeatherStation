@@ -8,6 +8,8 @@ const port = process.env.PORT || 3001;
 const apiKey = process.env.OPENWEATHER_API_KEY;
 const configKeyPath =
   process.env.OPENWEATHER_API_KEY_FILE || "/app/config/openweather.key";
+const calendarUrl = process.env.ICAL_URL;
+const calendarMax = parseInt(process.env.MAXIMUM_ENTRIES || "10", 10);
 
 const readKeyFromFile = () => {
   try {
@@ -157,6 +159,93 @@ app.get("/api/weather", async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: "Unexpected server error" });
+  }
+});
+
+const parseICalDate = (value) => {
+  if (!value) return null;
+  const cleaned = value.replace("Z", "");
+  if (/^\d{8}$/.test(cleaned)) {
+    const year = Number(cleaned.slice(0, 4));
+    const month = Number(cleaned.slice(4, 6)) - 1;
+    const day = Number(cleaned.slice(6, 8));
+    return new Date(Date.UTC(year, month, day));
+  }
+  if (/^\d{8}T\d{6}$/.test(cleaned)) {
+    const year = Number(cleaned.slice(0, 4));
+    const month = Number(cleaned.slice(4, 6)) - 1;
+    const day = Number(cleaned.slice(6, 8));
+    const hour = Number(cleaned.slice(9, 11));
+    const min = Number(cleaned.slice(11, 13));
+    const sec = Number(cleaned.slice(13, 15));
+    return value.endsWith("Z")
+      ? new Date(Date.UTC(year, month, day, hour, min, sec))
+      : new Date(year, month, day, hour, min, sec);
+  }
+  return null;
+};
+
+const parseICal = (text) => {
+  const lines = text.replace(/\r?\n[ \t]/g, "").split(/\r?\n/);
+  const events = [];
+  let current = null;
+  for (const line of lines) {
+    if (line === "BEGIN:VEVENT") {
+      current = {};
+      continue;
+    }
+    if (line === "END:VEVENT") {
+      if (current && current.start && current.summary) {
+        events.push(current);
+      }
+      current = null;
+      continue;
+    }
+    if (!current) continue;
+    const [rawKey, ...rest] = line.split(":");
+    const value = rest.join(":").trim();
+    const key = rawKey.split(";")[0];
+    if (key === "SUMMARY") {
+      current.summary = value;
+    }
+    if (key === "DTSTART") {
+      current.start = parseICalDate(value);
+      current.allDay = /^\d{8}$/.test(value);
+    }
+    if (key === "DTEND") {
+      current.end = parseICalDate(value);
+    }
+  }
+  return events;
+};
+
+app.get("/api/calendar", async (_req, res) => {
+  try {
+    if (!calendarUrl) {
+      return res.json({ events: [] });
+    }
+    const resp = await fetch(calendarUrl);
+    if (!resp.ok) {
+      return res.status(resp.status).json({ error: "Calendar fetch failed" });
+    }
+    const text = await resp.text();
+    const events = parseICal(text);
+    const now = new Date();
+    const upcoming = events
+      .filter((event) => event.start >= now)
+      .sort((a, b) => a.start - b.start)
+      .slice(0, calendarMax);
+
+    res.json({
+      events: upcoming.map((event) => ({
+        summary: event.summary,
+        start: event.start ? event.start.toISOString() : null,
+        end: event.end ? event.end.toISOString() : null,
+        allDay: Boolean(event.allDay)
+      }))
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Calendar parse failed" });
   }
 });
 

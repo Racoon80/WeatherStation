@@ -8,6 +8,7 @@ const windSpeed = document.getElementById("windSpeed");
 const forecastEl = document.getElementById("forecast");
 const updatedAt = document.getElementById("updatedAt");
 const windyEmbed = document.getElementById("windyEmbed");
+const calendarEvents = document.getElementById("calendarEvents");
 
 const compassPoints = [
   "N",
@@ -222,6 +223,55 @@ const loadWeather = async (city, country) => {
   return response.json();
 };
 
+const renderCalendar = (events) => {
+  if (!calendarEvents) return;
+  if (!events.length) {
+    calendarEvents.textContent = "No upcoming events.";
+    return;
+  }
+  const list = document.createElement("ul");
+  list.className = "calendar-list";
+  events.forEach((event) => {
+    const item = document.createElement("li");
+    const start = event.start ? new Date(event.start) : null;
+    const dateLabel = start
+      ? start.toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric"
+        })
+      : "--";
+    const timeLabel =
+      start && !event.allDay
+        ? start.toLocaleTimeString(undefined, {
+            hour: "2-digit",
+            minute: "2-digit"
+          })
+        : "All day";
+    item.innerHTML = `
+      <span>${dateLabel}</span>
+      <strong>${event.summary}</strong>
+      <em>${timeLabel}</em>
+    `;
+    list.appendChild(item);
+  });
+  calendarEvents.innerHTML = "";
+  calendarEvents.appendChild(list);
+};
+
+const loadCalendar = async () => {
+  if (!calendarEvents) return;
+  try {
+    const response = await fetch("/api/calendar");
+    if (!response.ok) {
+      throw new Error("Failed to load calendar");
+    }
+    const data = await response.json();
+    renderCalendar(data.events || []);
+  } catch (error) {
+    calendarEvents.textContent = "Calendar unavailable.";
+  }
+};
+
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   const formData = new FormData(form);
@@ -240,7 +290,9 @@ form.addEventListener("submit", async (event) => {
   try {
     const data = await loadWeather();
     updateUI(data);
+    loadCalendar();
   } catch (error) {
     forecastEl.textContent = "Unable to load data. Check the API key.";
+    loadCalendar();
   }
 })();

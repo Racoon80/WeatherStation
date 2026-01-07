@@ -178,6 +178,42 @@ h1 {
   padding: 1.2rem;
 }
 
+.calendar-events {
+  margin-top: 1rem;
+  color: #0b1f2a;
+}
+
+.calendar-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.calendar-list li {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 0.9rem;
+  padding: 0.7rem 0.9rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.calendar-list span {
+  font-size: 0.85rem;
+  color: rgba(11, 31, 42, 0.7);
+}
+
+.calendar-list strong {
+  font-size: 1rem;
+}
+
+.calendar-list em {
+  font-style: normal;
+  font-size: 0.85rem;
+  color: rgba(11, 31, 42, 0.7);
+}
+
 .wind-card {
   grid-column: span 6;
   grid-row: span 2;
