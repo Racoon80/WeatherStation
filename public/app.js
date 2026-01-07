@@ -35,6 +35,18 @@ const formatDay = (unix) => {
   return date.toLocaleDateString(undefined, { weekday: "short" });
 };
 
+const iconClassFor = (main) => {
+  const key = (main || "").toLowerCase();
+  if (key.includes("thunder")) return "icon-thunderstorm";
+  if (key.includes("drizzle")) return "icon-drizzle";
+  if (key.includes("rain")) return "icon-rain";
+  if (key.includes("snow")) return "icon-snow";
+  if (key.includes("mist") || key.includes("fog") || key.includes("haze"))
+    return "icon-mist";
+  if (key.includes("cloud")) return "icon-clouds";
+  return "icon-clear";
+};
+
 const directionLabel = (deg) => {
   const index = Math.round(deg / 22.5) % 16;
   return compassPoints[index];
@@ -52,11 +64,7 @@ const renderForecast = (days) => {
     tile.className = "forecast-tile";
 
     const main = day.weather?.[0]?.main || "";
-    const icon = day.weather?.[0]?.icon;
     const desc = day.weather?.[0]?.description || "";
-    const iconUrl = icon
-      ? `https://openweathermap.org/img/wn/${icon}@2x.png`
-      : "";
     const maxTemp =
       typeof day.temp?.max === "number" ? Math.round(day.temp.max) : null;
     const minTemp =
@@ -66,7 +74,7 @@ const renderForecast = (days) => {
 
     tile.innerHTML = `
       <strong>${formatDay(day.dt)}</strong>
-      ${iconUrl ? `<img src="${iconUrl}" alt="${desc}" />` : ""}
+      <div class="forecast-icon ${iconClassFor(main)}" aria-label="${desc}"></div>
       <div class="temp-range">
         <div>${maxTemp !== null ? `${maxTemp}°` : "--"}</div>
         <span>${minTemp !== null ? `${minTemp}°` : "--"}</span>
