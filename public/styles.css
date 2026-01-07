@@ -173,6 +173,11 @@ h1 {
   padding: 1.2rem;
 }
 
+.calendar-card {
+  grid-column: span 6;
+  padding: 1.2rem;
+}
+
 .wind-card {
   grid-column: span 6;
   grid-row: span 2;
@@ -237,31 +242,7 @@ h1 {
   font-weight: 600;
 }
 
-.wind-arrow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 6px;
-  height: 120px;
-  background: #d32626;
-  border-radius: 999px;
-  transform-origin: 50% 50%;
-  transform: translate(-50%, -50%) rotate(0deg);
-  transition: transform 0.6s ease;
-}
-
-.wind-arrow::after {
-  content: "";
-  position: absolute;
-  top: -14px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-bottom: 16px solid #d32626;
-}
+ 
 
 .wind-meta {
   display: grid;
