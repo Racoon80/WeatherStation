@@ -280,6 +280,37 @@ h1 {
   text-align: center;
 }
 
+.forecast-tile.weather-clear {
+  background: linear-gradient(160deg, #ffe7a8, #fff7db);
+}
+
+.forecast-tile.weather-clouds {
+  background: linear-gradient(160deg, #dfe7ef, #f4f7fb);
+}
+
+.forecast-tile.weather-rain {
+  background: linear-gradient(160deg, #cfe8ff, #edf6ff);
+}
+
+.forecast-tile.weather-drizzle {
+  background: linear-gradient(160deg, #d9f0ff, #f3f9ff);
+}
+
+.forecast-tile.weather-thunderstorm {
+  background: linear-gradient(160deg, #d9d2ff, #f4f0ff);
+}
+
+.forecast-tile.weather-snow {
+  background: linear-gradient(160deg, #e9f5ff, #ffffff);
+}
+
+.forecast-tile.weather-mist,
+.forecast-tile.weather-fog,
+.forecast-tile.weather-haze,
+.forecast-tile.weather-smoke {
+  background: linear-gradient(160deg, #e2e2e2, #f7f7f7);
+}
+
 .forecast-tile img {
   width: 52px;
   height: 52px;

@@ -51,6 +51,7 @@ const renderForecast = (days) => {
     const tile = document.createElement("div");
     tile.className = "forecast-tile";
 
+    const main = day.weather?.[0]?.main || "";
     const icon = day.weather?.[0]?.icon;
     const desc = day.weather?.[0]?.description || "";
     const iconUrl = icon
@@ -60,6 +61,8 @@ const renderForecast = (days) => {
       typeof day.temp?.max === "number" ? Math.round(day.temp.max) : null;
     const minTemp =
       typeof day.temp?.min === "number" ? Math.round(day.temp.min) : null;
+
+    tile.classList.add(`weather-${main.toLowerCase() || "clear"}`);
 
     tile.innerHTML = `
       <strong>${formatDay(day.dt)}</strong>
@@ -102,6 +105,8 @@ const loadWeather = async (city, country) => {
   const params = new URLSearchParams();
   if (city) params.set("city", city);
   if (country) params.set("country", country);
+  const lang = localStorage.getItem("weatherLang") || "en";
+  if (lang) params.set("lang", lang);
 
   const headers = {};
   const storedKey = localStorage.getItem("owmApiKey");

@@ -43,6 +43,7 @@ app.get("/api/weather", async (req, res) => {
 
     const city = (req.query.city || defaultCity).toString();
     const country = (req.query.country || defaultCountry).toString();
+    const lang = (req.query.lang || "").toString();
     const query = encodeURIComponent(`${city},${country}`);
 
     const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=1&appid=${activeKey}`;
@@ -59,8 +60,9 @@ app.get("/api/weather", async (req, res) => {
     const lat = loc.lat;
     const lon = loc.lon;
 
-    const currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${activeKey}`;
-    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${activeKey}`;
+    const langParam = lang ? `&lang=${encodeURIComponent(lang)}` : "";
+    const currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${activeKey}${langParam}`;
+    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${activeKey}${langParam}`;
 
     const [currentResp, forecastResp] = await Promise.all([
       fetch(currentUrl),
@@ -109,7 +111,7 @@ app.get("/api/weather", async (req, res) => {
 
     const daily = Array.from(byDay.values())
       .sort((a, b) => a.dt - b.dt)
-      .slice(0, 7)
+      .slice(0, 6)
       .map((entry) => {
         const pick = entry.midday || entry.samples[0];
         return {
@@ -122,10 +124,10 @@ app.get("/api/weather", async (req, res) => {
         };
       });
 
-    if (daily.length < 7) {
+    if (daily.length < 6) {
       const base = daily.length ? daily[daily.length - 1].dt : current.dt;
       const startLen = daily.length;
-      for (let i = startLen; i < 7; i += 1) {
+      for (let i = startLen; i < 6; i += 1) {
         daily.push({
           dt: base + 86400 * (i - startLen + 1),
           temp: {},
