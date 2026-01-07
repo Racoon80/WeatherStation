@@ -176,7 +176,7 @@ h1 {
   display: grid;
   gap: 1.6rem;
   align-content: start;
-  min-height: 340px;
+  min-height: 680px;
 }
 
 .location-name {
@@ -206,8 +206,9 @@ h1 {
 .wind-map {
   position: relative;
   width: 240px;
-  height: 220px;
+  height: 100%;
   margin: 0 auto;
+  flex: 1;
 }
 
 .wind-map svg {
