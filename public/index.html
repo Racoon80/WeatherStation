@@ -19,24 +19,55 @@
           <p class="eyebrow">WeatherStation</p>
           <h1>Live sky briefing for your country</h1>
           <p class="subhead">
-            Current position, wind direction, and a 7-day outlook in one glance.
+            Current position, wind direction, and a 6-day outlook in one glance.
           </p>
           <a class="settings-link" href="settings.html">Settings</a>
         </div>
-        <form id="locationForm" class="location-form">
-          <label>
-            City
-            <input type="text" name="city" placeholder="Luxembourg" required />
-          </label>
-          <label>
-            Country code
-            <input type="text" name="country" placeholder="LU" maxlength="2" required />
-          </label>
-          <button type="submit">Update</button>
-        </form>
+        <section class="card wind-card">
+          <h2>Wind direction</h2>
+          <div class="wind-map">
+            <svg viewBox="0 0 220 260" aria-hidden="true">
+              <path
+                d="M98 12l24 8 18 18 16 10 14 18 8 28-8 30-10 22-14 18-10 28-16 24-28 14-22-10-18-12-18-22-12-30-2-26 12-28 24-20 16-18 16-12z"
+                fill="url(#lux)"
+              />
+              <defs>
+                <linearGradient id="lux" x1="0" x2="1" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#f6cf7a" />
+                  <stop offset="100%" stop-color="#e07b4f" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="wind-arrow" id="windArrow"></div>
+          </div>
+          <div class="wind-meta">
+            <div>
+              <span>Direction</span>
+              <strong id="windDir">--</strong>
+            </div>
+            <div>
+              <span>Speed</span>
+              <strong id="windSpeed">--</strong>
+            </div>
+          </div>
+        </section>
       </header>
 
       <main class="grid">
+        <section class="card form-card">
+          <form id="locationForm" class="location-form">
+            <label>
+              City
+              <input type="text" name="city" placeholder="Luxembourg" required />
+            </label>
+            <label>
+              Country code
+              <input type="text" name="country" placeholder="LU" maxlength="2" required />
+            </label>
+            <button type="submit">Update</button>
+          </form>
+        </section>
+
         <section class="card position-card">
           <h2>Current position</h2>
           <p class="location-name" id="locationName">--</p>
@@ -52,24 +83,6 @@
             <div>
               <span>Country</span>
               <strong id="country">--</strong>
-            </div>
-          </div>
-        </section>
-
-        <section class="card wind-card">
-          <h2>Wind direction</h2>
-          <div class="wind-compass">
-            <div class="compass-face"></div>
-            <div class="compass-arrow" id="windArrow"></div>
-          </div>
-          <div class="wind-meta">
-            <div>
-              <span>Direction</span>
-              <strong id="windDir">--</strong>
-            </div>
-            <div>
-              <span>Speed</span>
-              <strong id="windSpeed">--</strong>
             </div>
           </div>
         </section>
