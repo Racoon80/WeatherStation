@@ -260,7 +260,7 @@ h1 {
 
 .forecast-card {
   grid-column: span 12;
-  background: linear-gradient(120deg, #f7f2ea, #f0e7d9);
+  background: var(--surface);
 }
 
 .forecast-header {
