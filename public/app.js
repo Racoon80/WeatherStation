@@ -8,6 +8,7 @@ const windDir = document.getElementById("windDir");
 const windSpeed = document.getElementById("windSpeed");
 const forecastEl = document.getElementById("forecast");
 const updatedAt = document.getElementById("updatedAt");
+const windyEmbed = document.getElementById("windyEmbed");
 
 const compassPoints = [
   "N",
@@ -167,6 +168,30 @@ const updateUI = (data) => {
   const countryInput = form.querySelector("input[name='country']");
   cityInput.value = data.location.name;
   countryInput.value = data.location.country;
+
+  if (windyEmbed) {
+    windyEmbed.innerHTML = "";
+    if (data.windyKey) {
+      const src =
+        "https://embed.windy.com/embed2" +
+        `?lat=${data.location.lat}` +
+        `&lon=${data.location.lon}` +
+        `&detailLat=${data.location.lat}` +
+        `&detailLon=${data.location.lon}` +
+        "&width=100%25&height=100%25" +
+        "&zoom=6&level=surface&overlay=wind&product=ecmwf" +
+        "&menu=&message=&marker=&calendar=&pressure=&type=map&location=coordinates" +
+        `&key=${data.windyKey}`;
+      const frame = document.createElement("iframe");
+      frame.src = src;
+      frame.loading = "lazy";
+      frame.referrerPolicy = "no-referrer-when-downgrade";
+      windyEmbed.appendChild(frame);
+    } else {
+      windyEmbed.innerHTML =
+        "<p class=\"windy-fallback\">Windy map unavailable. Add a `WINDY_API_KEY`.</p>";
+    }
+  }
 };
 
 const loadWeather = async (city, country) => {

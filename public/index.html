@@ -147,11 +147,11 @@
         <section class="card wind-card">
           <h2>Wind direction</h2>
           <div class="wind-map">
-            <img
-              src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Luxembourg_communes_map.svg"
-              alt="Luxembourg map"
-              class="wind-map-image"
-            />
+            <div class="windy-embed" id="windyEmbed">
+              <p class="windy-fallback">
+                Windy map unavailable. Add a `WINDY_API_KEY`.
+              </p>
+            </div>
             <div class="wind-arrow" id="windArrow"></div>
           </div>
           <div class="wind-meta">

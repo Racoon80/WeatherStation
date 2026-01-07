@@ -214,16 +214,26 @@ h1 {
   flex: 1;
 }
 
-.wind-map svg {
+.windy-embed {
   width: 100%;
   height: 100%;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.15);
+  display: grid;
+  place-items: center;
 }
 
-.wind-map-image {
+.windy-embed iframe {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  filter: saturate(1.1) contrast(1.1);
+  border: 0;
+}
+
+.windy-fallback {
+  margin: 0;
+  color: #0b1f2a;
+  font-weight: 600;
 }
 
 .wind-arrow {
@@ -591,8 +601,8 @@ h1 {
   }
 
   .wind-map {
-    width: 180px;
-    height: 170px;
+    width: 100%;
+    height: 320px;
   }
 
   .wind-arrow {

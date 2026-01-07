@@ -9,6 +9,7 @@ services:
       - OPENWEATHER_API_KEY=your_api_key_here
       - DEFAULT_CITY=Luxembourg
       - DEFAULT_COUNTRY=LU
+      - WINDY_API_KEY=your_windy_key_here
     volumes:
       - /mnt/user/appdata/WeatherStation:/app/config
     healthcheck:

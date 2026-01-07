@@ -148,7 +148,8 @@ app.get("/api/weather", async (req, res) => {
         wind_speed: current.wind?.speed,
         wind_deg: current.wind?.deg
       },
-      daily
+      daily,
+      windyKey: process.env.WINDY_API_KEY || ""
     });
   } catch (err) {
     res.status(500).json({ error: "Unexpected server error" });
