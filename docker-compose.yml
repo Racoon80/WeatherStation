@@ -1,6 +1,6 @@
 services:
   weatherstation:
-    build: .
+    build: /mnt/user/appdata/WeatherStation
     ports:
       - "3001:3001"
     environment:
