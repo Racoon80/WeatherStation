@@ -1,6 +1,7 @@
 services:
   weatherstation:
     build: /mnt/user/appdata/WeatherStation
+    image: WeatherStation
     restart: always
     ports:
       - "3001:3001"
