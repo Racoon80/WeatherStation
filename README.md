@@ -39,6 +39,11 @@ Environment variables:
 - `OPENWEATHER_API_KEY` (required)
 - `DEFAULT_CITY` (default: Luxembourg)
 - `DEFAULT_COUNTRY` (default: LU)
+- `OPENWEATHER_API_KEY_FILE` (default: `/app/config/openweather.key`)
+
+If you don't want to set the key in `docker-compose.yml`, create a file at
+`/mnt/user/appdata/WeatherStation/openweather.key` (because `/app/config` is
+mapped to that host path) and put the key on a single line.
 
 ## Settings page
 

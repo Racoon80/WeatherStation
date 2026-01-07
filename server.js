@@ -1,3 +1,4 @@
+const fs = require("fs");
 const path = require("path");
 const express = require("express");
 
@@ -5,6 +6,19 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 const apiKey = process.env.OPENWEATHER_API_KEY;
+const configKeyPath =
+  process.env.OPENWEATHER_API_KEY_FILE || "/app/config/openweather.key";
+
+const readKeyFromFile = () => {
+  try {
+    if (!fs.existsSync(configKeyPath)) {
+      return "";
+    }
+    return fs.readFileSync(configKeyPath, "utf8").trim();
+  } catch (err) {
+    return "";
+  }
+};
 const defaultCity = process.env.DEFAULT_CITY || "Luxembourg";
 const defaultCountry = process.env.DEFAULT_COUNTRY || "LU";
 
@@ -18,10 +32,13 @@ app.get("/api/weather", async (req, res) => {
   try {
     const requestKey =
       req.get("x-owm-key") || (req.query.apiKey || "").toString();
-    const activeKey = requestKey || apiKey;
+    const fileKey = readKeyFromFile();
+    const activeKey = requestKey || apiKey || fileKey;
 
     if (!activeKey) {
-      return res.status(500).json({ error: "Missing OPENWEATHER_API_KEY" });
+      return res
+        .status(500)
+        .json({ error: "Missing OPENWEATHER_API_KEY" });
     }
 
     const city = (req.query.city || defaultCity).toString();
