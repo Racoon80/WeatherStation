@@ -41,6 +41,9 @@ Environment variables:
 - `DEFAULT_COUNTRY` (default: LU)
 - `OPENWEATHER_API_KEY_FILE` (default: `/app/config/openweather.key`)
 - `WINDY_API_KEY` (optional, enables Windy embed)
+- `WINDY_ZOOM` (default: `12`)
+- `WINDY_ROTATELAYERS` (default: `false`)
+- `WINDY_LAYERSTOROTATE` (default: empty)
 
 If you don't want to set the key in `docker-compose.yml`, create a file at
 `/mnt/user/appdata/WeatherStation/openweather.key` (because `/app/config` is

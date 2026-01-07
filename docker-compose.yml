@@ -10,6 +10,9 @@ services:
       - DEFAULT_CITY=Luxembourg
       - DEFAULT_COUNTRY=LU
       - WINDY_API_KEY=your_windy_key_here
+      - WINDY_ZOOM=12
+      - WINDY_ROTATELAYERS=true
+      - WINDY_LAYERSTOROTATE=
     volumes:
       - /mnt/user/appdata/WeatherStation:/app/config
     healthcheck:

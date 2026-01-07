@@ -3,7 +3,6 @@ const locationName = document.getElementById("locationName");
 const latEl = document.getElementById("lat");
 const lonEl = document.getElementById("lon");
 const countryEl = document.getElementById("country");
-const windArrow = document.getElementById("windArrow");
 const windDir = document.getElementById("windDir");
 const windSpeed = document.getElementById("windSpeed");
 const forecastEl = document.getElementById("forecast");
@@ -154,7 +153,6 @@ const updateUI = (data) => {
   countryEl.textContent = data.location.country;
 
   const deg = data.current.wind_deg ?? 0;
-  windArrow.style.transform = `translate(-50%, -50%) rotate(${deg}deg)`;
   windDir.textContent = `${directionLabel(deg)} (${deg}°)`;
   windSpeed.textContent = `${Math.round(data.current.wind_speed)} m/s`;
 
@@ -172,6 +170,9 @@ const updateUI = (data) => {
   if (windyEmbed) {
     windyEmbed.innerHTML = "";
     if (data.windyKey) {
+      const zoom = data.windyZoom || "6";
+      const rotateLayers = data.windyRotate || "";
+      const layersToRotate = data.windyLayers || "";
       const src =
         "https://embed.windy.com/embed2" +
         `?lat=${data.location.lat}` +
@@ -179,7 +180,9 @@ const updateUI = (data) => {
         `&detailLat=${data.location.lat}` +
         `&detailLon=${data.location.lon}` +
         "&width=100%25&height=100%25" +
-        "&zoom=6&level=surface&overlay=wind&product=ecmwf" +
+        `&zoom=${encodeURIComponent(zoom)}&level=surface&overlay=wind&product=ecmwf` +
+        `&rotateLayers=${encodeURIComponent(rotateLayers)}` +
+        `&layersToRotate=${encodeURIComponent(layersToRotate)}` +
         "&menu=&message=&marker=&calendar=&pressure=&type=map&location=coordinates" +
         `&key=${data.windyKey}`;
       const frame = document.createElement("iframe");
