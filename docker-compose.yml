@@ -1,0 +1,9 @@
+services:
+  weatherstation:
+    build: .
+    ports:
+      - "3001:3001"
+    environment:
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
+      DEFAULT_CITY: ${DEFAULT_CITY:-Luxembourg}
+      DEFAULT_COUNTRY: ${DEFAULT_COUNTRY:-LU}
