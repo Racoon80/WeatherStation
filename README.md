@@ -1,13 +1,14 @@
 # WeatherStation
 
-Dockerized weather station that pulls data from OpenWeatherMap and renders a
-single-page dashboard with the current position, wind direction, and a 6-day
-forecast.
+Dockerized weather station dashboard with wind visualization, air quality,
+calendar events, and a 6-day forecast.
 
 ## Features
-- OpenWeatherMap geocoding + One Call 3.0 API
+- OpenWeatherMap geocoding + current/forecast data
 - Current position (lat/lon + country)
-- Wind direction compass and speed
+- Windy map embed with configurable layer/zoom
+- Air quality (AQI) from OpenWeatherMap
+- Calendar events from iCal feed
 - 6-day forecast summary
 
 ## Requirements
