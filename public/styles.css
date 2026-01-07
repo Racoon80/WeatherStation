@@ -59,6 +59,9 @@ body {
   position: relative;
   z-index: 1;
   margin-bottom: 3rem;
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  background: var(--surface);
 }
 
 .eyebrow {
