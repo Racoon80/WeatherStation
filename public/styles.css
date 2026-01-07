@@ -179,7 +179,7 @@ h1 {
   display: grid;
   gap: 1rem;
   align-content: stretch;
-  min-height: 680px;
+  min-height: 544px;
 }
 
 .location-name {
