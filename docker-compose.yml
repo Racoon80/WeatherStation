@@ -4,8 +4,8 @@ services:
     ports:
       - "3001:3001"
     environment:
-      # Export OPENWEATHER_API_KEY in your shell before running docker compose.
-      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
+      # Set your OpenWeatherMap API key here.
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY:-}
       DEFAULT_CITY: ${DEFAULT_CITY:-Luxembourg}
       DEFAULT_COUNTRY: ${DEFAULT_COUNTRY:-LU}
     healthcheck:
