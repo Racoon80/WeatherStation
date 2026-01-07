@@ -14,10 +14,8 @@ services:
       - WINDY_ROTATELAYERS=true
       - WINDY_LAYERSTOROTATE=wind,rain,radar
       - WINDY_DELAYROTATE=5000
-      - GOOGLE_CALENDAR_CLIENT_ID=your_client_id_here
-      - GOOGLE_CALENDAR_CLIENT_SECRET=your_client_secret_here
-      - GOOGLE_CALENDAR_REFRESH_TOKEN=your_refresh_token_here
-      - GOOGLE_CALENDAR_ID=your_calendar_id_here
+      - ICAL_URL=your_ical_url_here
+      - MAXIMUM_ENTRIES=10
     volumes:
       - /mnt/user/appdata/WeatherStation:/app/config
     healthcheck:
