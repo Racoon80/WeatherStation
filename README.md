@@ -15,12 +15,13 @@ forecast.
 
 ## Run with Docker
 
-1. Edit `docker-compose.yml` and set `OPENWEATHER_API_KEY`.
+1. Edit `/mnt/user/appdata/COMPOSE/WeatherStation/docker-compose.yml` and set
+   `OPENWEATHER_API_KEY`.
 
 2. Start the container:
 
 ```bash
-docker compose up --build
+docker compose -f /mnt/user/appdata/COMPOSE/WeatherStation/docker-compose.yml up --build
 ```
 
 3. Open `http://localhost:3001`
@@ -45,5 +46,5 @@ You can store an OpenWeatherMap API key in the browser at `/settings.html`. The
 dashboard will send that key with each request, overriding the server default.
 
 ## Notes
-- The 7-day forecast uses OpenWeatherMap One Call 3.0, which may require a paid
-  plan depending on your account.
+- The 7-day forecast uses OpenWeatherMap One Call 2.5 to avoid paid-tier
+  requirements.

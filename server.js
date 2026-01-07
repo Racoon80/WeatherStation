@@ -42,7 +42,7 @@ app.get("/api/weather", async (req, res) => {
     const lat = loc.lat;
     const lon = loc.lon;
 
-    const oneCallUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,alerts&units=metric&appid=${activeKey}`;
+    const oneCallUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,alerts&units=metric&appid=${activeKey}`;
     const weatherResp = await fetch(oneCallUrl);
     if (!weatherResp.ok) {
       return res.status(weatherResp.status).json({ error: "Weather fetch failed" });
