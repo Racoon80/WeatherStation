@@ -325,41 +325,10 @@ h1 {
   background: linear-gradient(160deg, #e2e2e2, #f7f7f7);
 }
 
-.forecast-icon {
-  width: 120px;
-  height: 120px;
-  background-image: url("assets/yahoo-weather-icons.png");
-  background-size: 860px 792px;
-  background-repeat: no-repeat;
-  filter: saturate(1.4) contrast(1.2) drop-shadow(0 6px 10px rgba(0, 0, 0, 0.2));
-}
-
-.forecast-icon.icon-clear {
-  background-position: -215px -396px;
-}
-
-.forecast-icon.icon-clouds {
-  background-position: -215px 0;
-}
-
-.forecast-icon.icon-rain {
-  background-position: -430px -396px;
-}
-
-.forecast-icon.icon-drizzle {
-  background-position: -215px -264px;
-}
-
-.forecast-icon.icon-thunderstorm {
-  background-position: -645px 0;
-}
-
-.forecast-icon.icon-snow {
-  background-position: -430px -132px;
-}
-
-.forecast-icon.icon-mist {
-  background-position: 0 -264px;
+.forecast-tile img {
+  width: 104px;
+  height: 104px;
+  filter: saturate(1.6) contrast(1.2) drop-shadow(0 6px 10px rgba(0, 0, 0, 0.12));
 }
 
 .temp-range {
