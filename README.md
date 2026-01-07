@@ -50,7 +50,7 @@ Environment variables:
 - `WINDY_ZOOM` (default: `6`)
 - `WINDY_SHOWLAYER` (default: `wind`)
 - `ICAL_URL` (required for calendar events)
-- `MAXIMUM_ENTRIES` (default: `10`)
+- `MAXIMUM_ENTRIES` (default: `8`)
 
 If you don't want to set the key in `docker-compose.yml`, create a file at
 `/mnt/user/appdata/WeatherStation/openweather.key` (because `/app/config` is

@@ -13,7 +13,7 @@ services:
       - WINDY_ZOOM=6
       - WINDY_SHOWLAYER=rain
       - ICAL_URL=your_ical_url_here
-      - MAXIMUM_ENTRIES=10
+      - MAXIMUM_ENTRIES=8
     volumes:
       - /mnt/user/appdata/WeatherStation:/app/config
     healthcheck:
