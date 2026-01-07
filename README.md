@@ -44,6 +44,7 @@ Environment variables:
 - `WINDY_ZOOM` (default: `12`)
 - `WINDY_ROTATELAYERS` (default: `false`)
 - `WINDY_LAYERSTOROTATE` (default: empty)
+- `WINDY_DELAYROTATE` (default: empty, in milliseconds)
 
 If you don't want to set the key in `docker-compose.yml`, create a file at
 `/mnt/user/appdata/WeatherStation/openweather.key` (because `/app/config` is

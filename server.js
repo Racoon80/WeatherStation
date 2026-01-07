@@ -152,7 +152,8 @@ app.get("/api/weather", async (req, res) => {
       windyKey: process.env.WINDY_API_KEY || "",
       windyZoom: process.env.WINDY_ZOOM || "",
       windyRotate: process.env.WINDY_ROTATELAYERS || "",
-      windyLayers: process.env.WINDY_LAYERSTOROTATE || ""
+      windyLayers: process.env.WINDY_LAYERSTOROTATE || "",
+      windyDelay: process.env.WINDY_DELAYROTATE || ""
     });
   } catch (err) {
     res.status(500).json({ error: "Unexpected server error" });

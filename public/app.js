@@ -173,6 +173,7 @@ const updateUI = (data) => {
       const zoom = data.windyZoom || "6";
       const rotateLayers = data.windyRotate || "";
       const layersToRotate = data.windyLayers || "";
+      const delayRotate = data.windyDelay || "";
       const src =
         "https://embed.windy.com/embed2" +
         `?lat=${data.location.lat}` +
@@ -183,6 +184,7 @@ const updateUI = (data) => {
         `&zoom=${encodeURIComponent(zoom)}&level=surface&overlay=wind&product=ecmwf` +
         `&rotateLayers=${encodeURIComponent(rotateLayers)}` +
         `&layersToRotate=${encodeURIComponent(layersToRotate)}` +
+        `&delayRotate=${encodeURIComponent(delayRotate)}` +
         "&menu=&message=&marker=&calendar=&pressure=&type=map&location=coordinates" +
         `&key=${data.windyKey}`;
       const frame = document.createElement("iframe");
