@@ -215,6 +215,13 @@ h1 {
   height: 100%;
 }
 
+.wind-map-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: saturate(1.1) contrast(1.1);
+}
+
 .wind-arrow {
   position: absolute;
   top: 20px;
