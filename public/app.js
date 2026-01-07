@@ -54,9 +54,7 @@ const renderForecast = (days) => {
     const main = day.weather?.[0]?.main || "";
     const icon = day.weather?.[0]?.icon;
     const desc = day.weather?.[0]?.description || "";
-    const iconUrl = icon
-      ? `https://openweathermap.org/img/wn/${icon}@2x.png`
-      : "";
+    const isNight = icon ? icon.endsWith("n") : false;
     const maxTemp =
       typeof day.temp?.max === "number" ? Math.round(day.temp.max) : null;
     const minTemp =
@@ -64,9 +62,79 @@ const renderForecast = (days) => {
 
     tile.classList.add(`weather-${main.toLowerCase() || "clear"}`);
 
+    const iconMarkup = (() => {
+      const cloud = `
+        <use xlink:href="#grayCloud" class="small-cloud" fill="url(#gradGray)"></use>
+        <use xlink:href="#whiteCloud" x="7"></use>
+      `;
+      const darkCloud = `
+        <use xlink:href="#grayCloud" class="small-cloud" fill="url(#gradGray)"></use>
+        <use xlink:href="#grayCloud" x="25" y="10" class="reverse-small-cloud" fill="url(#gradDarkGray)"></use>
+        <use xlink:href="#whiteCloud" x="7"></use>
+      `;
+      if (main.toLowerCase().includes("thunder")) {
+        return `
+          ${isNight ? `<use xlink:href="#moon" x="-20" y="-15"></use>` : `<use xlink:href="#sun" x="-12" y="-18"></use>`}
+          ${cloud}
+          <use xlink:href="#thunderBolt" x="52" y="55"></use>
+          <use xlink:href="#rainDrop" class="drop1" x="25" y="65"></use>
+          <use xlink:href="#rainDrop" class="drop3" x="45" y="65"></use>
+        `;
+      }
+      if (main.toLowerCase().includes("drizzle")) {
+        return `
+          ${isNight ? `<use xlink:href="#moon" x="-20" y="-15"></use>` : `<use xlink:href="#sun" x="-12" y="-18"></use>`}
+          ${cloud}
+          <use xlink:href="#rainDrizzle" class="rain-drizzle" x="25" y="65"></use>
+          <use xlink:href="#rainDrizzle" class="rain-drizzle" x="40" y="65"></use>
+        `;
+      }
+      if (main.toLowerCase().includes("rain")) {
+        return `
+          ${isNight ? `<use xlink:href="#moon" x="-20" y="-15"></use>` : `<use xlink:href="#sun" x="-12" y="-18"></use>`}
+          ${cloud}
+          <use xlink:href="#rainDrop" class="drop1" x="25" y="65"></use>
+          <use xlink:href="#rainDrop" class="drop3" x="45" y="65"></use>
+        `;
+      }
+      if (main.toLowerCase().includes("snow")) {
+        return `
+          ${isNight ? `<use xlink:href="#moon" x="-20" y="-15"></use>` : `<use xlink:href="#sun" x="-12" y="-18"></use>`}
+          ${cloud}
+          <use xlink:href="#snowFlake" class="snowflake2" x="30" y="65"></use>
+          <use xlink:href="#snowFlake" class="snowflake4" x="45" y="65"></use>
+          <use xlink:href="#snowFlake" class="snowflake5" x="58" y="65"></use>
+        `;
+      }
+      if (
+        main.toLowerCase().includes("mist") ||
+        main.toLowerCase().includes("fog") ||
+        main.toLowerCase().includes("haze")
+      ) {
+        return `
+          ${cloud}
+          <use xlink:href="#mist" class="mist-lines" x="5" y="35"></use>
+        `;
+      }
+      if (main.toLowerCase().includes("cloud")) {
+        return darkCloud;
+      }
+      if (isNight) {
+        return `
+          <use xlink:href="#moon" x="-15"></use>
+          <use xlink:href="#star" x="42" y="30" class="stars"></use>
+          <use xlink:href="#star" x="61" y="32" class="stars"></use>
+          <use xlink:href="#star" x="55" y="50" class="stars"></use>
+        `;
+      }
+      return `<use xlink:href="#sun"></use>`;
+    })();
+
     tile.innerHTML = `
       <strong>${formatDay(day.dt)}</strong>
-      ${iconUrl ? `<img src="${iconUrl}" alt="${desc}" />` : ""}
+      <svg class="forecast-icon" viewBox="0 0 100 100" aria-label="${desc}">
+        ${iconMarkup}
+      </svg>
       <div class="temp-range">
         <div>${maxTemp !== null ? `${maxTemp}°` : "--"}</div>
         <span>${minTemp !== null ? `${minTemp}°` : "--"}</span>
