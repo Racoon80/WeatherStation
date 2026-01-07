@@ -218,7 +218,8 @@ body {
 }
 
 .windy-embed {
-  width: min(100%, 480px);
+  width: 100%;
+  max-width: 640px;
   aspect-ratio: 3 / 4;
   border-radius: 1rem;
   overflow: hidden;
