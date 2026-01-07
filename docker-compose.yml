@@ -1,7 +1,6 @@
 services:
   weatherstation:
-    build: /mnt/user/appdata/WeatherStation
-    image: weatherstation
+    image: ghcr.io/racoon80/weatherstation:latest
     restart: always
     ports:
       - "3001:3001"
