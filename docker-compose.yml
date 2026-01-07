@@ -10,10 +10,8 @@ services:
       - DEFAULT_CITY=Luxembourg
       - DEFAULT_COUNTRY=LU
       - WINDY_API_KEY=your_windy_key_here
-      - WINDY_ZOOM=12
-      - WINDY_ROTATELAYERS=true
-      - WINDY_LAYERSTOROTATE=wind,rain,radar
-      - WINDY_DELAYROTATE=5000
+      - WINDY_ZOOM=6
+      - WINDY_SHOWLAYER=rain
       - ICAL_URL=your_ical_url_here
       - MAXIMUM_ENTRIES=10
     volumes:

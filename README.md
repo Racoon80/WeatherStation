@@ -47,10 +47,8 @@ Environment variables:
 - `DEFAULT_COUNTRY` (default: LU)
 - `OPENWEATHER_API_KEY_FILE` (default: `/app/config/openweather.key`)
 - `WINDY_API_KEY` (optional, enables Windy embed)
-- `WINDY_ZOOM` (default: `12`)
-- `WINDY_ROTATELAYERS` (default: `false`)
-- `WINDY_LAYERSTOROTATE` (default: empty)
-- `WINDY_DELAYROTATE` (default: empty, in milliseconds)
+- `WINDY_ZOOM` (default: `6`)
+- `WINDY_SHOWLAYER` (default: `wind`)
 - `ICAL_URL` (required for calendar events)
 - `MAXIMUM_ENTRIES` (default: `10`)
 
