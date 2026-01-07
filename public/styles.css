@@ -162,11 +162,11 @@ h1 {
 }
 
 .form-card {
-  grid-column: span 6;
+  grid-column: span 12;
 }
 
 .position-card {
-  grid-column: span 6;
+  grid-column: span 12;
   padding: 1.2rem;
 }
 
