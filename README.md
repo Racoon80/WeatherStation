@@ -83,3 +83,5 @@ mapped to that host path) and put the key on a single line.
 ## Notes
 - The forecast uses the free 5-day/3-hour endpoint and summarizes it into a
   daily view. If fewer than 6 days are available, placeholders fill the rest.
+  
+<a href="https://www.buymeacoffee.com/dv7g" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
