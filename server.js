@@ -356,6 +356,13 @@ app.get("/api/weather", async (req, res) => {
           },
           current: {
             dt: current.dt,
+            // The measurement right now, not today's forecast high — the hero
+            // used to repeat the first forecast tile.
+            temp: current.main?.temp,
+            feels_like: current.main?.feels_like,
+            // Comes from the current-conditions endpoint, so its icon carries
+            // the real day/night suffix instead of the midday sample's.
+            weather: current.weather || [],
             wind_speed: current.wind?.speed,
             wind_deg: current.wind?.deg
           },

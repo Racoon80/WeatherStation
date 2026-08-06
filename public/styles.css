@@ -112,7 +112,7 @@ main {
   gap: clamp(0.75rem, 1.5vw, 1.5rem);
 }
 
-.now__max {
+.now__temp {
   margin: 0;
   /* The single biggest thing on the screen: 167px at 1080p. Sized from the
      signage rule of thumb that a glanceable numeral needs roughly
@@ -124,7 +124,7 @@ main {
   letter-spacing: -0.04em;
 }
 
-.now__min {
+.now__range {
   margin: 0;
   font-size: clamp(1.5rem, 5.2vh, 3.5rem);
   font-weight: 300;

@@ -8,8 +8,8 @@ const updatedAt = document.getElementById("updatedAt");
 const windyEmbed = document.getElementById("windyEmbed");
 const calendarEvents = document.getElementById("calendarEvents");
 const currentIcon = document.getElementById("currentIcon");
-const todayMax = document.getElementById("todayMax");
-const todayMin = document.getElementById("todayMin");
+const currentTemp = document.getElementById("currentTemp");
+const todayRange = document.getElementById("todayRange");
 const clockEl = document.getElementById("clock");
 
 // Set from GET /api/config; every string below is looked up through it.
@@ -364,21 +364,29 @@ const renderForecast = (days) => {
   });
 };
 
-// The hero shows today's high and low with a matching icon. The current
-// endpoint only carries wind, so today's entry from the daily summary is the
-// source — the same data the first forecast tile uses.
-const renderHero = (today) => {
+// The big number is the measurement right now; today's high/low sits beside
+// it in small type and is repeated in the first forecast tile. Previously the
+// hero showed today's high, which made it a duplicate of that tile.
+const renderHero = (current, today) => {
+  const now = typeof current?.temp === "number" ? Math.round(current.temp) : null;
   const max = typeof today?.temp?.max === "number" ? Math.round(today.temp.max) : null;
   const min = typeof today?.temp?.min === "number" ? Math.round(today.temp.min) : null;
-  todayMax.textContent = max !== null ? `${max}°` : "--";
-  todayMin.textContent = min !== null ? `${min}°` : "";
 
-  const main = today?.weather?.[0]?.main || "";
-  const icon = today?.weather?.[0]?.icon;
-  currentIcon.innerHTML = iconMarkupFor(main, icon ? icon.endsWith("n") : false);
+  currentTemp.textContent = now !== null ? `${now}°` : "--";
+  todayRange.textContent =
+    max !== null && min !== null ? `${max}° / ${min}°` : "";
+
+  // Prefer the live conditions; fall back to today's summary if the current
+  // endpoint returned no weather block.
+  const source = current?.weather?.[0] || today?.weather?.[0] || {};
+  const main = source.main || "";
+  currentIcon.innerHTML = iconMarkupFor(
+    main,
+    source.icon ? source.icon.endsWith("n") : false
+  );
   currentIcon.setAttribute(
     "aria-label",
-    describe(main, today?.weather?.[0]?.description || "") || T.noData
+    describe(main, source.description || "") || T.noData
   );
 };
 
@@ -389,7 +397,7 @@ const updateUI = (data) => {
     ? `${data.location.name}, ${data.location.country}`
     : data.location.name;
 
-  renderHero(data.daily?.[0]);
+  renderHero(data.current, data.daily?.[0]);
 
   const deg = data.current.wind_deg;
   windDir.textContent = Number.isFinite(deg)
