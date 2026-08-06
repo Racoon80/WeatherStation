@@ -2,3 +2,19 @@ node_modules
 npm-debug.log
 .DS_Store
 .git
+.gitignore
+.gitattributes
+
+# Secrets — never bake these into a published image
+.env
+.env.*
+*.key
+config/
+
+# Tooling and docs, not needed at runtime
+.claude/
+.mcp.json
+*.md
+Dockerfile
+docker-compose.yml
+*.png

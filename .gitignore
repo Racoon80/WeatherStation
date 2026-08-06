@@ -1,3 +1,6 @@
+# Dependencies
+node_modules/
+
 # OS
 .DS_Store
 
@@ -10,5 +13,15 @@
 # Logs
 *.log
 
-# Env files
+# Secrets
 .env
+.env.*
+*.key
+config/
+
+# Local tooling
+.claude/
+.mcp.json
+
+# Local agent tooling
+CLAUDE.md

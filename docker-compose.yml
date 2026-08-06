@@ -1,11 +1,17 @@
 services:
   weatherstation:
     image: ghcr.io/racoon80/weatherstation:latest
+    # Uncomment to build the local source instead of pulling the published image.
+    # build: .
     restart: always
+    init: true
     ports:
+      # Reachable on every host interface. If only the reverse proxy should
+      # reach it and the proxy runs on this host, use "127.0.0.1:3001:3001".
       - "3001:3001"
     environment:
-      # Set your OpenWeatherMap API key here.
+      # Prefer env_file (below) or the key file over inline secrets: values set
+      # here are visible in `docker inspect` and easy to commit by accident.
       - OPENWEATHER_API_KEY=your_api_key_here
       - DEFAULT_CITY=Luxembourg
       - DEFAULT_COUNTRY=LU
@@ -14,8 +20,20 @@ services:
       - WINDY_SHOWLAYER=rain
       - ICAL_URL=your_ical_url_here
       - MAXIMUM_ENTRIES=8
+    # env_file:
+    #   - .env
     volumes:
-      - /mnt/user/appdata/WeatherStation:/app/config
+      # Read-only: the app only ever reads openweather.key from here.
+      - /mnt/user/appdata/WeatherStation:/app/config:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 256m
+    pids_limit: 128
     healthcheck:
       test:
         [
@@ -25,3 +43,4 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
