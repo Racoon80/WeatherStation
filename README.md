@@ -31,6 +31,18 @@ The compose file pulls the published image, so `--build` does nothing. To run
 your own build instead, uncomment `build: .` in the compose file and add
 `--build`.
 
+## Image publishing
+
+`.github/workflows/docker-publish.yml` builds and pushes
+`ghcr.io/racoon80/weatherstation` on every push to `master` (and on `v*` tags)
+for `linux/amd64` and `linux/arm64`, so the published image cannot drift from
+the source. Tags: `latest` on master, `sha-<commit>` for every build, and
+semver tags on releases. `workflow_dispatch` rebuilds without a code change,
+which is how you pick up base-image security patches.
+
+To pin a deployment to an exact build, replace `:latest` in the compose file
+with the digest from the workflow summary.
+
 ## Docker Compose file
 
 ```yaml

@@ -12,6 +12,7 @@ npm-debug.log
 config/
 
 # Tooling and docs, not needed at runtime
+.github/
 .claude/
 .mcp.json
 *.md
