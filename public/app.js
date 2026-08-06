@@ -91,7 +91,7 @@ const STRINGS = {
       "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"
     ],
     wind: "Wand",
-    speed: "Vitesse",
+    speed: "Geschwindegkeet",
     airQuality: "Loftqualitéit",
     calendar: "Kalenner",
     loading: "Lueden…",
