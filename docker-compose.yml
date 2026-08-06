@@ -15,6 +15,9 @@ services:
       - OPENWEATHER_API_KEY=your_api_key_here
       - DEFAULT_CITY=Luxembourg
       - DEFAULT_COUNTRY=LU
+      # Interface language: LU, DE, FR or EN. Anything else falls back to EN
+      # and logs a warning.
+      - UI_LANGUAGE=LU
       - WINDY_API_KEY=your_windy_key_here
       - WINDY_ZOOM=6
       - WINDY_SHOWLAYER=rain

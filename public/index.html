@@ -117,15 +117,15 @@
 
           <dl class="facts">
             <div class="fact">
-              <dt>Wind</dt>
+              <dt data-i18n="wind">Wind</dt>
               <dd id="windDir">--</dd>
             </div>
             <div class="fact">
-              <dt>Speed</dt>
+              <dt data-i18n="speed">Speed</dt>
               <dd id="windSpeed">--</dd>
             </div>
             <div class="fact">
-              <dt>Air quality</dt>
+              <dt data-i18n="airQuality">Air quality</dt>
               <dd id="airQuality">--</dd>
             </div>
           </dl>
@@ -145,8 +145,10 @@
           </div>
 
           <div class="panel panel--calendar">
-            <h2 class="panel__title">Calendar</h2>
-            <div id="calendarEvents" class="calendar-events">Loading…</div>
+            <h2 class="panel__title" data-i18n="calendar">Calendar</h2>
+            <div id="calendarEvents" class="calendar-events" data-i18n="loading">
+              Loading…
+            </div>
           </div>
         </section>
       </main>
@@ -158,6 +160,7 @@
             name="city"
             placeholder="Luxembourg"
             aria-label="City"
+            data-i18n-placeholder="city"
             required
           />
           <input
@@ -166,9 +169,10 @@
             placeholder="LU"
             maxlength="2"
             aria-label="Country code"
+            data-i18n-placeholder="country"
             required
           />
-          <button type="submit">Go</button>
+          <button type="submit" data-i18n="go">Go</button>
         </form>
         <p class="footer__updated" id="updatedAt">--</p>
       </footer>

@@ -57,6 +57,7 @@ services:
       - OPENWEATHER_API_KEY=your_api_key_here
       - DEFAULT_CITY=Luxembourg
       - DEFAULT_COUNTRY=LU
+      - UI_LANGUAGE=LU
       - WINDY_API_KEY=your_windy_key_here
       - WINDY_ZOOM=6
       - WINDY_SHOWLAYER=rain
@@ -92,6 +93,10 @@ Environment variables:
 - `OPENWEATHER_API_KEY_FILE` (default: `/app/config/openweather.key`)
 - `DEFAULT_CITY` (default: `Luxembourg`)
 - `DEFAULT_COUNTRY` (default: `LU`, must be a 2-letter code)
+- `UI_LANGUAGE` (default: `EN`) — one of `LU`, `DE`, `FR`, `EN`. Sets the
+  interface labels, weekday and month names, air-quality wording and the
+  language of the weather descriptions. An unrecognised value falls back to
+  `EN` and logs a warning at startup.
 - `PORT` (default: `3001`; changing it also requires updating the published
   port and the healthcheck URL in the compose file)
 - `WINDY_API_KEY` (optional, enables Windy embed — note this key is sent to
@@ -118,6 +123,10 @@ log as `Cannot read API key file … EACCES`.
 ## Notes
 - The forecast uses the free 5-day/3-hour endpoint and summarizes it into a
   daily view. If fewer than 6 days are available, placeholders fill the rest.
+- OpenWeatherMap has no Luxembourgish. With `UI_LANGUAGE=LU` the API is
+  queried in English and the condition descriptions are translated in the
+  browser from a built-in table; an unmapped description falls back to the
+  condition group, then to the English original — never to a blank.
 - API responses are cached in-process (weather 5 min, air quality 10 min,
   calendar 5 min) and `/api/*` is rate limited to 60 requests per minute per
   IP, so a refreshing dashboard cannot burn the free-tier quota.

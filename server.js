@@ -107,6 +107,22 @@ const FORECAST_DAYS = 6;
 const defaultCity = process.env.DEFAULT_CITY || "Luxembourg";
 const defaultCountry = process.env.DEFAULT_COUNTRY || "LU";
 
+const SUPPORTED_LANGUAGES = ["EN", "DE", "FR", "LU"];
+
+const uiLanguage = (() => {
+  const raw = (process.env.UI_LANGUAGE || "EN").trim().toUpperCase();
+  if (SUPPORTED_LANGUAGES.includes(raw)) return raw;
+  console.error(
+    `UI_LANGUAGE="${raw}" is not one of ${SUPPORTED_LANGUAGES.join("/")}, using EN`
+  );
+  return "EN";
+})();
+
+// OpenWeatherMap has no Luxembourgish. For LU we ask for English — a stable
+// key set — and the client translates it; the other three come translated.
+const OWM_LANG = { EN: "en", DE: "de", FR: "fr", LU: "en" };
+const owmLang = OWM_LANG[uiLanguage];
+
 // One /api/weather hit costs three upstream calls, so an unthrottled loop
 // burns the free-tier quota in seconds. Fixed-window limiter, no dependency.
 const RATE_LIMIT_WINDOW_MS = 60000;
@@ -189,6 +205,12 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
+// Served separately from /api/weather so the page can localise its static
+// labels immediately, without waiting on three upstream calls.
+app.get("/api/config", (_req, res) => {
+  res.json({ language: uiLanguage });
+});
+
 app.use("/api", rateLimit);
 
 app.get("/api/weather", async (req, res) => {
@@ -202,7 +224,6 @@ app.get("/api/weather", async (req, res) => {
 
     const city = (req.query.city || defaultCity).toString().trim();
     const country = (req.query.country || defaultCountry).toString().trim();
-    const lang = (req.query.lang || "").toString().trim();
 
     if (!city || city.length > 64) {
       return res.status(400).json({ error: "Invalid city" });
@@ -210,12 +231,10 @@ app.get("/api/weather", async (req, res) => {
     if (!/^[A-Za-z]{2}$/.test(country)) {
       return res.status(400).json({ error: "Invalid country" });
     }
-    if (lang && !/^[a-z]{2}$/.test(lang)) {
-      return res.status(400).json({ error: "Invalid lang" });
-    }
-
     const payload = await cached(
-      `weather:${city.toLowerCase()}:${country.toLowerCase()}:${lang}`,
+      // The language is fixed per deployment, but it is part of the key so a
+      // restart with a different UI_LANGUAGE cannot serve a stale translation.
+      `weather:${city.toLowerCase()}:${country.toLowerCase()}:${uiLanguage}`,
       WEATHER_TTL_MS,
       async () => {
         const appid = encodeURIComponent(activeKey);
@@ -237,7 +256,7 @@ app.get("/api/weather", async (req, res) => {
         const lat = loc.lat;
         const lon = loc.lon;
 
-        const langParam = lang ? `&lang=${encodeURIComponent(lang)}` : "";
+        const langParam = `&lang=${owmLang}`;
         const currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${appid}${langParam}`;
         const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${appid}${langParam}`;
 
@@ -341,6 +360,7 @@ app.get("/api/weather", async (req, res) => {
             wind_deg: current.wind?.deg
           },
           daily,
+          language: uiLanguage,
           windyKey: process.env.WINDY_API_KEY || "",
           windyZoom: process.env.WINDY_ZOOM || "",
           windyLayer: process.env.WINDY_SHOWLAYER || "wind",

@@ -12,6 +12,168 @@ const todayMax = document.getElementById("todayMax");
 const todayMin = document.getElementById("todayMin");
 const clockEl = document.getElementById("clock");
 
+// Set from GET /api/config; every string below is looked up through it.
+const STRINGS = {
+  EN: {
+    locale: "en-GB",
+    htmlLang: "en",
+    wind: "Wind",
+    speed: "Speed",
+    airQuality: "Air quality",
+    calendar: "Calendar",
+    loading: "Loading…",
+    noEvents: "No upcoming events.",
+    noForecast: "No forecast data available.",
+    calendarError: "Calendar unavailable.",
+    weatherErrorKey: "Unable to load weather. Check the API key.",
+    weatherErrorCity: "Unable to load weather. Check the location.",
+    allDay: "All day",
+    updated: "Updated",
+    go: "Go",
+    city: "City",
+    country: "Country code",
+    noData: "No data",
+    aqi: ["Good", "Fair", "Moderate", "Poor", "Very poor"],
+    aqiUnknown: "Unknown"
+  },
+  DE: {
+    locale: "de-DE",
+    htmlLang: "de",
+    wind: "Wind",
+    speed: "Geschwindigkeit",
+    airQuality: "Luftqualität",
+    calendar: "Kalender",
+    loading: "Wird geladen…",
+    noEvents: "Keine anstehenden Termine.",
+    noForecast: "Keine Vorhersagedaten verfügbar.",
+    calendarError: "Kalender nicht verfügbar.",
+    weatherErrorKey: "Laden fehlgeschlagen. API-Schlüssel prüfen.",
+    weatherErrorCity: "Laden fehlgeschlagen. Ort prüfen.",
+    allDay: "Ganztägig",
+    updated: "Aktualisiert",
+    go: "Los",
+    city: "Stadt",
+    country: "Ländercode",
+    noData: "Keine Daten",
+    aqi: ["Gut", "Mäßig", "Mittel", "Schlecht", "Sehr schlecht"],
+    aqiUnknown: "Unbekannt"
+  },
+  FR: {
+    locale: "fr-FR",
+    htmlLang: "fr",
+    wind: "Vent",
+    speed: "Vitesse",
+    airQuality: "Qualité de l'air",
+    calendar: "Calendrier",
+    loading: "Chargement…",
+    noEvents: "Aucun évènement à venir.",
+    noForecast: "Aucune prévision disponible.",
+    calendarError: "Calendrier indisponible.",
+    weatherErrorKey: "Échec du chargement. Vérifiez la clé API.",
+    weatherErrorCity: "Échec du chargement. Vérifiez le lieu.",
+    allDay: "Journée entière",
+    updated: "Mis à jour",
+    go: "OK",
+    city: "Ville",
+    country: "Code pays",
+    noData: "Aucune donnée",
+    aqi: ["Bonne", "Correcte", "Moyenne", "Mauvaise", "Très mauvaise"],
+    aqiUnknown: "Inconnue"
+  },
+  LU: {
+    // Intl has no reliable lb-LU on every browser, so LU weekday and month
+    // names are supplied below rather than left to toLocaleDateString.
+    locale: "de-DE",
+    htmlLang: "lb",
+    weekdays: ["Son", "Méi", "Dën", "Mët", "Don", "Fre", "Sam"],
+    months: [
+      "Jan", "Feb", "Mäe", "Abr", "Mee", "Jun",
+      "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"
+    ],
+    wind: "Wand",
+    speed: "Vitesse",
+    airQuality: "Loftqualitéit",
+    calendar: "Kalenner",
+    loading: "Lueden…",
+    noEvents: "Keng Termine geplangt.",
+    noForecast: "Keng Prognosdaten do.",
+    calendarError: "Kalenner net verfügbar.",
+    weatherErrorKey: "Lueden feelgeschloen. API-Schlëssel préiwen.",
+    weatherErrorCity: "Lueden feelgeschloen. Uert préiwen.",
+    allDay: "Ganzen Dag",
+    updated: "Aktualiséiert",
+    go: "Lass",
+    city: "Stad",
+    country: "Landescode",
+    noData: "Keng Daten",
+    aqi: ["Gutt", "Uerdentlech", "Mëttel", "Schlecht", "Ganz schlecht"],
+    aqiUnknown: "Onbekannt"
+  }
+};
+
+// OpenWeatherMap returns English for LU (it has no Luxembourgish), so the
+// descriptions are mapped here. Anything unlisted falls back to the condition
+// group, then to the raw English — never to a blank.
+const LU_CONDITIONS = {
+  "clear sky": "kloeren Himmel",
+  "few clouds": "e puer Wolleken",
+  "scattered clouds": "verspreet Wolleken",
+  "broken clouds": "opgelackert bewëllt",
+  "overcast clouds": "bedeckt",
+  "light rain": "liichte Reen",
+  "moderate rain": "moderate Reen",
+  "heavy intensity rain": "staarke Reen",
+  "very heavy rain": "ganz staarke Reen",
+  "extreme rain": "extreme Reen",
+  "freezing rain": "gefréierende Reen",
+  "light intensity shower rain": "liicht Reeschauer",
+  "shower rain": "Reeschauer",
+  "heavy intensity shower rain": "staark Reeschauer",
+  "light intensity drizzle": "liichten Nisel",
+  drizzle: "Nisel",
+  "heavy intensity drizzle": "staarken Nisel",
+  "light snow": "liichte Schnéi",
+  snow: "Schnéi",
+  "heavy snow": "vill Schnéi",
+  sleet: "Schnéireen",
+  "light rain and snow": "liichte Reen a Schnéi",
+  "rain and snow": "Reen a Schnéi",
+  thunderstorm: "Donnerwieder",
+  "thunderstorm with light rain": "Donnerwieder mat liichte Reen",
+  "thunderstorm with rain": "Donnerwieder mat Reen",
+  "thunderstorm with heavy rain": "Donnerwieder mat staarke Reen",
+  mist: "Niwwel",
+  fog: "Niwwel",
+  haze: "Donscht",
+  smoke: "Damp",
+  dust: "Stëbs",
+  sand: "Sand",
+  squall: "Bö",
+  tornado: "Tornado"
+};
+
+const LU_GROUPS = {
+  clear: "kloer",
+  clouds: "bewëllt",
+  rain: "Reen",
+  drizzle: "Nisel",
+  snow: "Schnéi",
+  thunderstorm: "Donnerwieder",
+  mist: "Niwwel",
+  fog: "Niwwel",
+  haze: "Donscht"
+};
+
+let T = STRINGS.EN;
+
+const describe = (main, description) => {
+  if (T !== STRINGS.LU) return description;
+  const key = (description || "").toLowerCase();
+  return (
+    LU_CONDITIONS[key] || LU_GROUPS[(main || "").toLowerCase()] || description
+  );
+};
+
 const compassPoints = [
   "N",
   "NNE",
@@ -38,9 +200,41 @@ const formatDay = (day) => {
   const date = day.date
     ? new Date(`${day.date}T12:00:00Z`)
     : new Date(day.dt * 1000);
-  return date.toLocaleDateString(undefined, {
+  if (T.weekdays) {
+    return T.weekdays[day.date ? date.getUTCDay() : date.getDay()];
+  }
+  return date.toLocaleDateString(T.locale, {
     weekday: "short",
     timeZone: day.date ? "UTC" : undefined
+  });
+};
+
+const formatEventDate = (date) => {
+  if (T.months) {
+    return `${T.months[date.getMonth()]} ${date.getDate()}`;
+  }
+  return date.toLocaleDateString(T.locale, { month: "short", day: "numeric" });
+};
+
+const formatTime = (date) =>
+  date.toLocaleTimeString(T.locale, { hour: "2-digit", minute: "2-digit" });
+
+// Static labels live in the markup with a data-i18n key so the HTML stays
+// readable and there is exactly one place that knows the strings.
+const applyStaticLabels = () => {
+  // Not derived from `locale`: LU borrows de-DE for number and time
+  // formatting, but the document is Luxembourgish, not German.
+  document.documentElement.lang = T.htmlLang || "en";
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const value = T[el.dataset.i18n];
+    if (value) el.textContent = value;
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+    const value = T[el.dataset.i18nPlaceholder];
+    if (value) {
+      el.placeholder = value;
+      el.setAttribute("aria-label", value);
+    }
   });
 };
 
@@ -124,7 +318,7 @@ const iconMarkupFor = (main, isNight) => {
 const renderForecast = (days) => {
   forecastEl.innerHTML = "";
   if (!days.length) {
-    forecastEl.textContent = "No forecast data available.";
+    forecastEl.textContent = T.noForecast;
     return;
   }
 
@@ -134,7 +328,7 @@ const renderForecast = (days) => {
 
     const main = day.weather?.[0]?.main || "";
     const icon = day.weather?.[0]?.icon;
-    const desc = day.weather?.[0]?.description || "";
+    const desc = describe(main, day.weather?.[0]?.description || "");
     const isNight = icon ? icon.endsWith("n") : false;
     const maxTemp =
       typeof day.temp?.max === "number" ? Math.round(day.temp.max) : null;
@@ -164,7 +358,7 @@ const renderForecast = (days) => {
     `;
     tile.querySelector("strong").textContent = formatDay(day);
     tile.querySelector("svg").setAttribute("aria-label", desc);
-    tile.querySelector("small").textContent = desc || "No data";
+    tile.querySelector("small").textContent = desc || T.noData;
 
     forecastEl.appendChild(tile);
   });
@@ -184,7 +378,7 @@ const renderHero = (today) => {
   currentIcon.innerHTML = iconMarkupFor(main, icon ? icon.endsWith("n") : false);
   currentIcon.setAttribute(
     "aria-label",
-    today?.weather?.[0]?.description || "Current conditions"
+    describe(main, today?.weather?.[0]?.description || "") || T.noData
   );
 };
 
@@ -205,9 +399,9 @@ const updateUI = (data) => {
     ? `${Math.round(data.current.wind_speed)} m/s`
     : "--";
 
-  updatedAt.textContent = `Updated ${new Date(
-    data.current.dt * 1000
-  ).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+  updatedAt.textContent = `${T.updated} ${formatTime(
+    new Date(data.current.dt * 1000)
+  )}`;
 
   renderForecast(data.daily);
 
@@ -275,8 +469,7 @@ const renderAirQuality = (data) => {
     airQualityEl.textContent = "--";
     return;
   }
-  const labels = ["Good", "Fair", "Moderate", "Poor", "Very poor"];
-  const label = labels[data.aqi - 1] || "Unknown";
+  const label = T.aqi[data.aqi - 1] || T.aqiUnknown;
   airQualityEl.textContent = `${label} (AQI ${data.aqi})`;
 };
 
@@ -284,8 +477,6 @@ const loadWeather = async (city, country) => {
   const params = new URLSearchParams();
   if (city) params.set("city", city);
   if (country) params.set("country", country);
-  const lang = localStorage.getItem("weatherLang") || "en";
-  if (lang) params.set("lang", lang);
 
   const response = await fetch(`/api/weather?${params.toString()}`);
   if (!response.ok) {
@@ -298,7 +489,7 @@ const loadWeather = async (city, country) => {
 const renderCalendar = (events) => {
   if (!calendarEvents) return;
   if (!events.length) {
-    calendarEvents.textContent = "No upcoming events.";
+    calendarEvents.textContent = T.noEvents;
     return;
   }
   const list = document.createElement("ul");
@@ -306,19 +497,9 @@ const renderCalendar = (events) => {
   events.forEach((event) => {
     const item = document.createElement("li");
     const start = event.start ? new Date(event.start) : null;
-    const dateLabel = start
-      ? start.toLocaleDateString(undefined, {
-          month: "short",
-          day: "numeric"
-        })
-      : "--";
+    const dateLabel = start ? formatEventDate(start) : "--";
     const timeLabel =
-      start && !event.allDay
-        ? start.toLocaleTimeString(undefined, {
-            hour: "2-digit",
-            minute: "2-digit"
-          })
-        : "All day";
+      start && !event.allDay ? formatTime(start) : T.allDay;
     // textContent, not innerHTML: event.summary is attacker-controllable via
     // the iCal feed (shared calendars, accepted invites).
     const dateNode = document.createElement("span");
@@ -344,7 +525,7 @@ const loadCalendar = async () => {
     const data = await response.json();
     renderCalendar(data.events || []);
   } catch (error) {
-    calendarEvents.textContent = "Calendar unavailable.";
+    calendarEvents.textContent = T.calendarError;
   }
 };
 
@@ -364,8 +545,8 @@ const refresh = async (city, country) => {
       data = await loadWeather(city, country);
     } catch (error) {
       forecastEl.textContent = city
-        ? "Unable to load weather. Check the location."
-        : "Unable to load weather. Check the API key.";
+        ? T.weatherErrorCity
+        : T.weatherErrorKey;
       return;
     }
 
@@ -397,12 +578,8 @@ form.addEventListener("submit", (event) => {
 // A wall display should show the time. Ticks every 10s rather than every
 // second: the readout has no seconds, so a faster timer only wastes wakeups.
 const tickClock = () => {
-  clockEl.textContent = new Date().toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit"
-  });
+  clockEl.textContent = formatTime(new Date());
 };
-tickClock();
 setInterval(tickClock, 10000);
 
 // This is an always-on wall display: without a timer it would show the load
@@ -417,4 +594,20 @@ document.addEventListener("visibilitychange", () => {
   if (!document.hidden) tick();
 });
 
-refresh();
+// Language is resolved before the first render so nothing flashes in English
+// on a display configured for another language. A failed config call leaves
+// the EN default in place rather than blocking the dashboard.
+(async () => {
+  try {
+    const response = await fetch("/api/config");
+    if (response.ok) {
+      const config = await response.json();
+      if (STRINGS[config.language]) T = STRINGS[config.language];
+    }
+  } catch (error) {
+    /* keep the default */
+  }
+  applyStaticLabels();
+  tickClock();
+  refresh();
+})();
