@@ -13,7 +13,12 @@
   --warm: #ffc861;
   --cool: #7ec8ff;
 
-  --gap: clamp(1.5rem, 3.5vw, 3.5rem);
+  /* The binding constraint on a kiosk is HEIGHT, so vertical rhythm and every
+     type size scale with vh, not vw. At 1080p, 1vh = 10.8px. */
+  --gap: clamp(0.5rem, 1.4vh, 1.5rem);
+  --pad-block: clamp(0.6rem, 1.8vh, 1.75rem);
+  --pad-inline: clamp(1rem, 2.5vw, 3.5rem);
+  --label: clamp(0.6rem, 1.15vh, 0.8rem);
 }
 
 *,
@@ -40,14 +45,23 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* One screen, no scrollbar. Four rows size to their content and the panels
+   row absorbs whatever is left, so the Windy map fills the gap instead of
+   dictating the page height (its 16/9 box used to push 344px off a 1080p
+   screen). min-height:0 on the flexible row is what lets it actually shrink. */
 .page {
-  max-width: 1600px;
+  height: 100svh;
+  max-width: 2200px;
   margin: 0 auto;
-  padding: clamp(1.5rem, 3vw, 3rem) clamp(1.25rem, 4vw, 4rem)
-    clamp(1.5rem, 3vw, 3rem);
-  display: flex;
-  flex-direction: column;
+  padding: var(--pad-block) var(--pad-inline);
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
   gap: var(--gap);
+  overflow: hidden;
+}
+
+main {
+  display: contents;
 }
 
 /* ---------- top bar ---------- */
@@ -57,13 +71,13 @@ body {
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
-  padding-bottom: clamp(0.75rem, 1.5vw, 1.25rem);
+  padding-bottom: clamp(0.4rem, 1vh, 1rem);
   border-bottom: 1px solid var(--rule);
 }
 
 .place {
   margin: 0;
-  font-size: clamp(1.35rem, 2.6vw, 2.4rem);
+  font-size: clamp(1.1rem, 2.4vh, 2.2rem);
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -71,7 +85,7 @@ body {
 
 .clock {
   margin: 0;
-  font-size: clamp(1.35rem, 2.6vw, 2.4rem);
+  font-size: clamp(1.1rem, 2.4vh, 2.2rem);
   font-weight: 300;
   color: var(--ink-dim);
   letter-spacing: 0.04em;
@@ -83,12 +97,12 @@ body {
   display: grid;
   grid-template-columns: auto auto 1fr;
   align-items: center;
-  gap: clamp(1.5rem, 4vw, 4rem);
+  gap: clamp(1rem, 3vw, 4rem);
 }
 
 .now__icon {
-  width: clamp(6rem, 12vw, 11rem);
-  height: clamp(6rem, 12vw, 11rem);
+  width: clamp(4rem, 11vh, 9rem);
+  height: clamp(4rem, 11vh, 9rem);
   flex: none;
 }
 
@@ -100,8 +114,9 @@ body {
 
 .now__max {
   margin: 0;
-  /* The single biggest thing on the screen — readable across a room. */
-  font-size: clamp(4.5rem, 13vw, 10rem);
+  /* The single biggest thing on the screen. 13vh = 140px at 1080p, which is
+     legible at 3-4m; capped so it does not run away on a tall monitor. */
+  font-size: clamp(3.25rem, 13vh, 9rem);
   font-weight: 200;
   line-height: 0.85;
   letter-spacing: -0.04em;
@@ -109,7 +124,7 @@ body {
 
 .now__min {
   margin: 0;
-  font-size: clamp(1.5rem, 3.5vw, 3rem);
+  font-size: clamp(1.25rem, 4vh, 2.75rem);
   font-weight: 300;
   line-height: 1;
   color: var(--ink-dim);
@@ -118,14 +133,17 @@ body {
 .facts {
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
-  gap: clamp(0.75rem, 2vw, 2rem);
+  /* Side by side on a wide kiosk so the block stays short; the hero row's
+     height is set by the temperature, not by a stack of facts. */
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: clamp(0.75rem, 2.5vw, 3rem);
   justify-self: end;
   text-align: right;
 }
 
 .fact dt {
-  font-size: 0.72em;
+  font-size: var(--label);
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -133,13 +151,13 @@ body {
 }
 
 .fact dd {
-  margin: 0.25em 0 0;
-  font-size: clamp(1.05rem, 1.7vw, 1.5rem);
+  margin: 0.3em 0 0;
+  font-size: clamp(0.95rem, 2vh, 1.5rem);
   font-weight: 400;
 }
 
 .fact--coords dd {
-  font-size: clamp(0.85rem, 1.2vw, 1.05rem);
+  font-size: clamp(0.75rem, 1.5vh, 1.05rem);
   color: var(--ink-dim);
   display: flex;
   gap: 0.5em;
@@ -152,7 +170,7 @@ body {
 .forecast {
   border-top: 1px solid var(--rule);
   border-bottom: 1px solid var(--rule);
-  padding: clamp(1rem, 2.5vw, 2rem) 0;
+  padding: clamp(0.6rem, 1.6vh, 1.5rem) 0;
 }
 
 .forecast-row {
@@ -164,7 +182,7 @@ body {
 .forecast-tile {
   display: grid;
   justify-items: center;
-  gap: clamp(0.35rem, 0.8vw, 0.75rem);
+  gap: clamp(0.2rem, 0.7vh, 0.7rem);
   text-align: center;
   /* Deliberately flat: the old build gave each tile its own coloured
      gradient card, which fought the icons and dated the whole page. */
@@ -174,7 +192,7 @@ body {
 }
 
 .forecast-tile > strong {
-  font-size: 0.78em;
+  font-size: clamp(0.65rem, 1.4vh, 1rem);
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -182,8 +200,8 @@ body {
 }
 
 .forecast-icon {
-  width: clamp(3rem, 6vw, 5.5rem);
-  height: clamp(3rem, 6vw, 5.5rem);
+  width: clamp(2.25rem, 7vh, 5rem);
+  height: clamp(2.25rem, 7vh, 5rem);
 }
 
 .temp-range {
@@ -193,18 +211,18 @@ body {
 }
 
 .temp-range div {
-  font-size: clamp(1.15rem, 2.2vw, 2rem);
+  font-size: clamp(1rem, 2.6vh, 2rem);
   font-weight: 300;
 }
 
 .temp-range span {
-  font-size: clamp(0.8rem, 1.3vw, 1.1rem);
+  font-size: clamp(0.7rem, 1.6vh, 1.1rem);
   font-weight: 300;
   color: var(--ink-faint);
 }
 
 .forecast-tile > small {
-  font-size: 0.75em;
+  font-size: clamp(0.6rem, 1.3vh, 0.9rem);
   color: var(--ink-faint);
   text-transform: lowercase;
   /* Descriptions vary wildly in length; keep tiles on one grid row. */
@@ -222,24 +240,35 @@ body {
 
 .panels {
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: 1.7fr 1fr;
   gap: var(--gap);
-  align-items: start;
+  /* Inherits the page's flexible row; both panels stretch to fill it. */
+  min-height: 0;
+}
+
+.panel {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .panel__title {
-  margin: 0 0 0.9em;
-  font-size: 0.78em;
+  margin: 0 0 0.8em;
+  font-size: var(--label);
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ink-faint);
+  flex: none;
 }
 
+/* No aspect-ratio: the map takes the height it is given. That is the whole
+   reason the page fits — a 16/9 box at this width wanted 490px. */
 .windy-embed {
   position: relative;
+  flex: 1;
+  min-height: 0;
   width: 100%;
-  aspect-ratio: 16 / 9;
   border-radius: 4px;
   overflow: hidden;
   background: rgba(238, 242, 247, 0.03);
@@ -263,8 +292,14 @@ body {
   color: var(--ink-faint);
 }
 
+/* A long feed scrolls inside its own column rather than growing the page;
+   an empty one just leaves the column short, which reads as calm, not broken. */
 .calendar-events {
   color: var(--ink-dim);
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 
 .calendar-list {
@@ -278,7 +313,7 @@ body {
   grid-template-columns: 5.5em 1fr auto;
   align-items: baseline;
   gap: 1em;
-  padding: 0.7em 0;
+  padding: clamp(0.3em, 0.8vh, 0.7em) 0;
   border-bottom: 1px solid var(--rule);
 }
 
@@ -315,9 +350,9 @@ body {
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
-  padding-top: clamp(0.75rem, 1.5vw, 1.25rem);
+  padding-top: clamp(0.4rem, 1vh, 1rem);
   border-top: 1px solid var(--rule);
-  font-size: 0.85em;
+  font-size: clamp(0.7rem, 1.5vh, 0.95rem);
   color: var(--ink-faint);
 }
 
@@ -377,11 +412,13 @@ body {
 @media (max-width: 1100px) {
   .now {
     grid-template-columns: auto 1fr;
-    row-gap: clamp(1rem, 3vw, 2rem);
+    row-gap: clamp(0.5rem, 1.5vh, 1.5rem);
   }
 
   .facts {
     grid-column: 1 / -1;
+    grid-auto-flow: row;
+    grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
     justify-self: stretch;
     text-align: left;
   }
@@ -392,6 +429,35 @@ body {
 
   .panels {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Below these sizes a single screen stops being achievable without shrinking
+   the numbers past legibility, so the page reverts to a normal scrolling
+   document. The kiosk case is the constrained one, not the phone. */
+@media (max-width: 720px), (max-height: 680px) {
+  .page {
+    height: auto;
+    min-height: 100svh;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 4vw, 2rem);
+  }
+
+  main {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 4vw, 2rem);
+  }
+
+  .windy-embed {
+    aspect-ratio: 16 / 9;
+    flex: none;
+  }
+
+  .calendar-events {
+    overflow: visible;
   }
 }
 
