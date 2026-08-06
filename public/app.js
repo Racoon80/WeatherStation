@@ -395,8 +395,10 @@ const updateUI = (data) => {
   windDir.textContent = Number.isFinite(deg)
     ? `${directionLabel(deg)} (${deg}°)`
     : "--";
+  // OpenWeatherMap reports wind in m/s even with units=metric. Everyday
+  // forecasts here quote km/h, so convert rather than pass it through.
   windSpeed.textContent = Number.isFinite(data.current.wind_speed)
-    ? `${Math.round(data.current.wind_speed)} m/s`
+    ? `${Math.round(data.current.wind_speed * 3.6)} km/h`
     : "--";
 
   updatedAt.textContent = `${T.updated} ${formatTime(

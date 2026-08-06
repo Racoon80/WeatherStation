@@ -123,6 +123,8 @@ log as `Cannot read API key file … EACCES`.
 ## Notes
 - The forecast uses the free 5-day/3-hour endpoint and summarizes it into a
   daily view. If fewer than 6 days are available, placeholders fill the rest.
+- Wind speed is shown in km/h. OpenWeatherMap reports m/s even when asked for
+  metric units, so the value is converted in the browser.
 - OpenWeatherMap has no Luxembourgish. With `UI_LANGUAGE=LU` the API is
   queried in English and the condition descriptions are translated in the
   browser from a built-in table; an unmapped description falls back to the
