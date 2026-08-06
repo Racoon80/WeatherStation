@@ -101,8 +101,8 @@ main {
 }
 
 .now__icon {
-  width: clamp(4rem, 11vh, 9rem);
-  height: clamp(4rem, 11vh, 9rem);
+  width: clamp(4rem, 13vh, 10rem);
+  height: clamp(4rem, 13vh, 10rem);
   flex: none;
 }
 
@@ -114,9 +114,11 @@ main {
 
 .now__max {
   margin: 0;
-  /* The single biggest thing on the screen. 13vh = 140px at 1080p, which is
-     legible at 3-4m; capped so it does not run away on a tall monitor. */
-  font-size: clamp(3.25rem, 13vh, 9rem);
+  /* The single biggest thing on the screen: 167px at 1080p. Sized from the
+     signage rule of thumb that a glanceable numeral needs roughly
+     viewing-distance/50 of cap height — ~80mm at 4m, which on a 50" 1080p
+     panel is ~140px of cap height, i.e. ~168px nominal. */
+  font-size: clamp(3.25rem, 15.5vh, 11rem);
   font-weight: 200;
   line-height: 0.85;
   letter-spacing: -0.04em;
@@ -124,7 +126,7 @@ main {
 
 .now__min {
   margin: 0;
-  font-size: clamp(1.25rem, 4vh, 2.75rem);
+  font-size: clamp(1.5rem, 5.2vh, 3.5rem);
   font-weight: 300;
   line-height: 1;
   color: var(--ink-dim);
@@ -156,13 +158,14 @@ main {
   font-weight: 400;
 }
 
-.fact--coords dd {
-  font-size: clamp(0.75rem, 1.5vh, 1.05rem);
-  color: var(--ink-dim);
-  display: flex;
-  gap: 0.5em;
-  justify-content: flex-end;
-  flex-wrap: wrap;
+/* Rows must be allowed to shrink below their content, or the grid's implicit
+   min-height:auto floor lets a long row push the footer off the screen. */
+.topbar,
+.now,
+.forecast,
+.panels,
+.footer {
+  min-height: 0;
 }
 
 /* ---------- forecast ---------- */
@@ -300,6 +303,16 @@ main {
   min-height: 0;
   overflow-y: auto;
   scrollbar-width: thin;
+}
+
+/* With no events the panel is a tall empty column; centring the message makes
+   the space read as deliberate rather than as a failed render. */
+.calendar-events:not(:has(.calendar-list)) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--ink-faint);
 }
 
 .calendar-list {

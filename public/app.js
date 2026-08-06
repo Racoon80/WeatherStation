@@ -1,8 +1,5 @@
 const form = document.getElementById("locationForm");
 const locationName = document.getElementById("locationName");
-const latEl = document.getElementById("lat");
-const lonEl = document.getElementById("lon");
-const countryEl = document.getElementById("country");
 const airQualityEl = document.getElementById("airQuality");
 const windDir = document.getElementById("windDir");
 const windSpeed = document.getElementById("windSpeed");
@@ -33,9 +30,6 @@ const compassPoints = [
   "NW",
   "NNW"
 ];
-
-const formatCoord = (value) =>
-  Number.isFinite(value) ? `${value.toFixed(3)}°` : "--";
 
 // Prefers the server's precomputed local date (YYYY-MM-DD) over the raw
 // timestamp: `dt` is the first sample of the location's day, which can land on
@@ -195,10 +189,11 @@ const renderHero = (today) => {
 };
 
 const updateUI = (data) => {
-  locationName.textContent = data.location.name;
-  latEl.textContent = formatCoord(data.location.lat);
-  lonEl.textContent = formatCoord(data.location.lon);
-  countryEl.textContent = data.location.country;
+  // Country folded into the title: as a separate fact it was a 15px string of
+  // coordinates, which nobody can read from across a room.
+  locationName.textContent = data.location.country
+    ? `${data.location.name}, ${data.location.country}`
+    : data.location.name;
 
   renderHero(data.daily?.[0]);
 
