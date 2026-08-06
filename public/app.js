@@ -30,11 +30,20 @@ const compassPoints = [
   "NNW"
 ];
 
-const formatCoord = (value) => `${value.toFixed(3)}°`;
+const formatCoord = (value) =>
+  Number.isFinite(value) ? `${value.toFixed(3)}°` : "--";
 
-const formatDay = (unix) => {
-  const date = new Date(unix * 1000);
-  return date.toLocaleDateString(undefined, { weekday: "short" });
+// Prefers the server's precomputed local date (YYYY-MM-DD) over the raw
+// timestamp: `dt` is the first sample of the location's day, which can land on
+// the previous weekday once the browser renders it in its own timezone.
+const formatDay = (day) => {
+  const date = day.date
+    ? new Date(`${day.date}T12:00:00Z`)
+    : new Date(day.dt * 1000);
+  return date.toLocaleDateString(undefined, {
+    weekday: "short",
+    timeZone: day.date ? "UTC" : undefined
+  });
 };
 
 const directionLabel = (deg) => {
@@ -62,7 +71,15 @@ const renderForecast = (days) => {
     const minTemp =
       typeof day.temp?.min === "number" ? Math.round(day.temp.min) : null;
 
-    tile.classList.add(`weather-${main.toLowerCase() || "clear"}`);
+    // `main` is upstream data; classList.add throws on whitespace or empty
+    // strings, which would abort the whole render. Padding days get a neutral
+    // class instead of being styled as a confident sunny forecast.
+    if (day.placeholder) {
+      tile.classList.add("forecast-tile--empty");
+    } else {
+      const mainClass = main.toLowerCase().replace(/[^a-z]/g, "") || "clear";
+      tile.classList.add(`weather-${mainClass}`);
+    }
 
     const iconMarkup = (() => {
       const cloud = `
@@ -132,17 +149,22 @@ const renderForecast = (days) => {
       return `<use xlink:href="#sun"></use>`;
     })();
 
+    // iconMarkup is built from string literals only; day/desc come from the
+    // upstream API and are set as text afterwards rather than interpolated.
     tile.innerHTML = `
-      <strong>${formatDay(day.dt)}</strong>
-      <svg class="forecast-icon" viewBox="0 0 100 100" aria-label="${desc}">
+      <strong></strong>
+      <svg class="forecast-icon" viewBox="0 0 100 100">
         ${iconMarkup}
       </svg>
       <div class="temp-range">
         <div>${maxTemp !== null ? `${maxTemp}°` : "--"}</div>
         <span>${minTemp !== null ? `${minTemp}°` : "--"}</span>
       </div>
-      <small>${desc || "No data"}</small>
+      <small></small>
     `;
+    tile.querySelector("strong").textContent = formatDay(day);
+    tile.querySelector("svg").setAttribute("aria-label", desc);
+    tile.querySelector("small").textContent = desc || "No data";
 
     forecastEl.appendChild(tile);
   });
@@ -154,9 +176,13 @@ const updateUI = (data) => {
   lonEl.textContent = formatCoord(data.location.lon);
   countryEl.textContent = data.location.country;
 
-  const deg = data.current.wind_deg ?? 0;
-  windDir.textContent = `${directionLabel(deg)} (${deg}°)`;
-  windSpeed.textContent = `${Math.round(data.current.wind_speed)} m/s`;
+  const deg = data.current.wind_deg;
+  windDir.textContent = Number.isFinite(deg)
+    ? `${directionLabel(deg)} (${deg}°)`
+    : "--";
+  windSpeed.textContent = Number.isFinite(data.current.wind_speed)
+    ? `${Math.round(data.current.wind_speed)} m/s`
+    : "--";
 
   updatedAt.textContent = `Updated ${new Date(
     data.current.dt * 1000
@@ -170,34 +196,43 @@ const updateUI = (data) => {
   countryInput.value = data.location.country;
 
   if (windyEmbed) {
-    windyEmbed.innerHTML = "";
     if (data.windyKey) {
       const zoom = data.windyZoom || "6";
+      const layer = data.windyLayer || "wind";
       const rotateLayers = data.windyRotate || "";
       const layersToRotate = data.windyLayers || "";
       const delayRotate = data.windyDelay || "";
+      const lat = Number(data.location.lat);
+      const lon = Number(data.location.lon);
       const src =
         "https://embed.windy.com/embed2" +
-        `?lat=${data.location.lat}` +
-        `&lon=${data.location.lon}` +
-        `&detailLat=${data.location.lat}` +
-        `&detailLon=${data.location.lon}` +
+        `?lat=${lat}` +
+        `&lon=${lon}` +
+        `&detailLat=${lat}` +
+        `&detailLon=${lon}` +
         "&width=100%25&height=100%25" +
-        `&zoom=${encodeURIComponent(zoom)}&level=surface&overlay=wind&product=ecmwf` +
+        `&zoom=${encodeURIComponent(zoom)}&level=surface` +
+        `&overlay=${encodeURIComponent(layer)}&product=ecmwf` +
         `&rotateLayers=${encodeURIComponent(rotateLayers)}` +
         `&layersToRotate=${encodeURIComponent(layersToRotate)}` +
         `&delayRotate=${encodeURIComponent(delayRotate)}` +
         "&menu=&message=&marker=&calendar=&pressure=&type=map&location=coordinates" +
-        `&key=${data.windyKey}`;
-      const frame = document.createElement("iframe");
-      frame.src = src;
-      frame.loading = "lazy";
-      frame.referrerPolicy = "no-referrer-when-downgrade";
-      windyEmbed.appendChild(frame);
-    } else {
-      windyEmbed.innerHTML =
-        "<p class=\"windy-fallback\">Windy map unavailable. Add a `WINDY_API_KEY`.</p>";
+        `&key=${encodeURIComponent(data.windyKey)}`;
+      // Rebuilding the iframe reloads the map and discards the user's pan and
+      // zoom, so only do it when the URL actually changed.
+      const existing = windyEmbed.querySelector("iframe");
+      if (!existing || existing.src !== src) {
+        windyEmbed.innerHTML = "";
+        const frame = document.createElement("iframe");
+        frame.src = src;
+        frame.loading = "lazy";
+        // no-referrer: do not hand the dashboard's own URL to windy.com.
+        frame.referrerPolicy = "no-referrer";
+        frame.sandbox = "allow-scripts allow-same-origin";
+        windyEmbed.appendChild(frame);
+      }
     }
+    // No key: leave the static fallback markup from index.html in place.
   }
 };
 
@@ -231,10 +266,7 @@ const loadWeather = async (city, country) => {
   const lang = localStorage.getItem("weatherLang") || "en";
   if (lang) params.set("lang", lang);
 
-  const headers = {};
-  const response = await fetch(`/api/weather?${params.toString()}`, {
-    headers
-  });
+  const response = await fetch(`/api/weather?${params.toString()}`);
   if (!response.ok) {
     throw new Error("Failed to load weather");
   }
@@ -266,11 +298,15 @@ const renderCalendar = (events) => {
             minute: "2-digit"
           })
         : "All day";
-    item.innerHTML = `
-      <span>${dateLabel}</span>
-      <strong>${event.summary}</strong>
-      <em>${timeLabel}</em>
-    `;
+    // textContent, not innerHTML: event.summary is attacker-controllable via
+    // the iCal feed (shared calendars, accepted invites).
+    const dateNode = document.createElement("span");
+    dateNode.textContent = dateLabel;
+    const summaryNode = document.createElement("strong");
+    summaryNode.textContent = event.summary || "";
+    const timeNode = document.createElement("em");
+    timeNode.textContent = timeLabel;
+    item.append(dateNode, summaryNode, timeNode);
     list.appendChild(item);
   });
   calendarEvents.innerHTML = "";
@@ -291,32 +327,62 @@ const loadCalendar = async () => {
   }
 };
 
-form.addEventListener("submit", async (event) => {
+// Single entry point for both the initial load, the form submit and the
+// refresh timer. Previously the submit path skipped air quality entirely, so
+// searching a new city left the previous city's AQI on screen.
+let currentCity = "";
+let currentCountry = "";
+let inFlight = false;
+
+const refresh = async (city, country) => {
+  if (inFlight) return;
+  inFlight = true;
+  try {
+    let data;
+    try {
+      data = await loadWeather(city, country);
+    } catch (error) {
+      forecastEl.textContent = city
+        ? "Unable to load weather. Check the location."
+        : "Unable to load weather. Check the API key.";
+      return;
+    }
+
+    currentCity = data.location.name;
+    currentCountry = data.location.country;
+    updateUI(data);
+
+    // Each panel fails on its own: an air-quality outage used to wipe the
+    // forecast that had already rendered successfully.
+    await Promise.allSettled([
+      loadAirQuality(data.location.lat, data.location.lon)
+        .then(renderAirQuality)
+        .catch(() => {
+          if (airQualityEl) airQualityEl.textContent = "--";
+        }),
+      loadCalendar()
+    ]);
+  } finally {
+    inFlight = false;
+  }
+};
+
+form.addEventListener("submit", (event) => {
   event.preventDefault();
   const formData = new FormData(form);
-  try {
-    const data = await loadWeather(
-      formData.get("city"),
-      formData.get("country")
-    );
-    updateUI(data);
-  } catch (error) {
-    forecastEl.textContent = "Unable to load data. Check the location.";
-  }
+  refresh(formData.get("city"), formData.get("country"));
 });
 
-(async () => {
-  try {
-    const data = await loadWeather();
-    updateUI(data);
-    const air = await loadAirQuality(data.location.lat, data.location.lon);
-    renderAirQuality(air);
-    loadCalendar();
-  } catch (error) {
-    forecastEl.textContent = "Unable to load data. Check the API key.";
-    if (airQualityEl) {
-      airQualityEl.textContent = "--";
-    }
-    loadCalendar();
-  }
-})();
+// This is an always-on wall display: without a timer it would show the load
+// time snapshot forever while "Updated …" keeps aging.
+const REFRESH_MS = 10 * 60 * 1000;
+const tick = () => {
+  if (document.hidden) return;
+  refresh(currentCity, currentCountry);
+};
+setInterval(tick, REFRESH_MS);
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) tick();
+});
+
+refresh();
