@@ -4,12 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WeatherStation</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap"
-      rel="stylesheet"
-    />
+    <meta name="color-scheme" content="dark" />
+    <!-- System fonts only: no third-party request from a wall display that
+         runs 24/7, and nothing to load before the numbers appear. -->
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -99,77 +96,90 @@
         </symbol>
       </svg>
 
-      <main class="grid">
-        <section class="card form-card">
-          <form id="locationForm" class="location-form">
-            <label>
-              City
-              <input type="text" name="city" placeholder="Luxembourg" required />
-            </label>
-            <label>
-              Country code
-              <input type="text" name="country" placeholder="LU" maxlength="2" required />
-            </label>
-            <button type="submit">Update</button>
-          </form>
+      <header class="topbar">
+        <h1 class="place" id="locationName">--</h1>
+        <p class="clock" id="clock">--:--</p>
+      </header>
+
+      <main>
+        <section class="now">
+          <svg
+            class="now__icon"
+            id="currentIcon"
+            viewBox="0 0 100 100"
+            aria-hidden="true"
+          ></svg>
+
+          <div class="now__temps">
+            <p class="now__max" id="todayMax">--</p>
+            <p class="now__min" id="todayMin">--</p>
+          </div>
+
+          <dl class="facts">
+            <div class="fact">
+              <dt>Wind</dt>
+              <dd id="windDir">--</dd>
+            </div>
+            <div class="fact">
+              <dt>Speed</dt>
+              <dd id="windSpeed">--</dd>
+            </div>
+            <div class="fact">
+              <dt>Air quality</dt>
+              <dd id="airQuality">--</dd>
+            </div>
+            <div class="fact fact--coords">
+              <dt>Position</dt>
+              <dd>
+                <span id="lat">--</span>
+                <span id="lon">--</span>
+                <span id="country">--</span>
+              </dd>
+            </div>
+          </dl>
         </section>
 
-        <section class="card position-card">
-          <h2>Current position</h2>
-          <p class="location-name" id="locationName">--</p>
-          <div class="coords">
-            <div>
-              <span>Latitude</span>
-              <strong id="lat">--</strong>
-            </div>
-            <div>
-              <span>Longitude</span>
-              <strong id="lon">--</strong>
-            </div>
-            <div>
-              <span>Country</span>
-              <strong id="country">--</strong>
-            </div>
-          </div>
-          <div class="wind-meta">
-            <div>
-              <span>Direction</span>
-              <strong id="windDir">--</strong>
-            </div>
-            <div>
-              <span>Speed</span>
-              <strong id="windSpeed">--</strong>
-            </div>
-          </div>
-          <div class="airquality">
-            <span>Actual Airquality</span>
-            <strong id="airQuality">--</strong>
-          </div>
+        <section class="forecast" aria-label="6-day forecast">
+          <div id="forecast" class="forecast-row"></div>
         </section>
 
-        <section class="card wind-card">
-          <div class="wind-map">
+        <section class="panels">
+          <div class="panel panel--map">
             <div class="windy-embed" id="windyEmbed">
               <p class="windy-fallback">
-                Windy map unavailable. Add a `WINDY_API_KEY`.
+                Windy map unavailable. Add a WINDY_API_KEY.
               </p>
             </div>
           </div>
-        </section>
 
-        <section class="card calendar-card">
-          <h2>Calendar</h2>
-          <div id="calendarEvents" class="calendar-events">Loading…</div>
-        </section>
-
-        <section class="card forecast-card">
-          <div class="forecast-header">
-            <h2>6-day forecast</h2>
-            <p id="updatedAt">--</p>
+          <div class="panel panel--calendar">
+            <h2 class="panel__title">Calendar</h2>
+            <div id="calendarEvents" class="calendar-events">Loading…</div>
           </div>
-          <div id="forecast" class="forecast-grid"></div>
         </section>
       </main>
+
+      <footer class="footer">
+        <form id="locationForm" class="place-form">
+          <input
+            type="text"
+            name="city"
+            placeholder="Luxembourg"
+            aria-label="City"
+            required
+          />
+          <input
+            type="text"
+            name="country"
+            placeholder="LU"
+            maxlength="2"
+            aria-label="Country code"
+            required
+          />
+          <button type="submit">Go</button>
+        </form>
+        <p class="footer__updated" id="updatedAt">--</p>
+      </footer>
     </div>
 
     <script src="app.js"></script>

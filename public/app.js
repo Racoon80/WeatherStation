@@ -10,6 +10,10 @@ const forecastEl = document.getElementById("forecast");
 const updatedAt = document.getElementById("updatedAt");
 const windyEmbed = document.getElementById("windyEmbed");
 const calendarEvents = document.getElementById("calendarEvents");
+const currentIcon = document.getElementById("currentIcon");
+const todayMax = document.getElementById("todayMax");
+const todayMin = document.getElementById("todayMin");
+const clockEl = document.getElementById("clock");
 
 const compassPoints = [
   "N",
@@ -51,6 +55,78 @@ const directionLabel = (deg) => {
   return compassPoints[index];
 };
 
+// Built from string literals only — no upstream value is ever interpolated
+// into the markup, which is what keeps the innerHTML assignments below safe.
+// Shared by the forecast tiles and the hero icon.
+const iconMarkupFor = (main, isNight) => {
+  const kind = main.toLowerCase();
+  const luminary = isNight
+    ? `<use xlink:href="#moon" x="-20" y="-15"></use>`
+    : `<use xlink:href="#sun" x="-12" y="-18"></use>`;
+  const cloud = `
+    <use xlink:href="#grayCloud" class="small-cloud" fill="url(#gradGray)"></use>
+    <use xlink:href="#whiteCloud" x="7"></use>
+  `;
+  const darkCloud = `
+    <use xlink:href="#grayCloud" class="small-cloud" fill="url(#gradGray)"></use>
+    <use xlink:href="#grayCloud" x="25" y="10" class="reverse-small-cloud" fill="url(#gradDarkGray)"></use>
+    <use xlink:href="#whiteCloud" x="7"></use>
+  `;
+
+  if (kind.includes("thunder")) {
+    return `
+      ${luminary}
+      ${cloud}
+      <use xlink:href="#thunderBolt" x="52" y="55"></use>
+      <use xlink:href="#rainDrop" class="drop1" x="25" y="65"></use>
+      <use xlink:href="#rainDrop" class="drop3" x="45" y="65"></use>
+    `;
+  }
+  if (kind.includes("drizzle")) {
+    return `
+      ${luminary}
+      ${cloud}
+      <use xlink:href="#rainDrizzle" class="rain-drizzle" x="25" y="65"></use>
+      <use xlink:href="#rainDrizzle" class="rain-drizzle" x="40" y="65"></use>
+    `;
+  }
+  if (kind.includes("rain")) {
+    return `
+      ${luminary}
+      ${cloud}
+      <use xlink:href="#rainDrop" class="drop1" x="25" y="65"></use>
+      <use xlink:href="#rainDrop" class="drop3" x="45" y="65"></use>
+    `;
+  }
+  if (kind.includes("snow")) {
+    return `
+      ${luminary}
+      ${cloud}
+      <use xlink:href="#snowFlake" class="snowflake2" x="30" y="65"></use>
+      <use xlink:href="#snowFlake" class="snowflake4" x="45" y="65"></use>
+      <use xlink:href="#snowFlake" class="snowflake5" x="58" y="65"></use>
+    `;
+  }
+  if (kind.includes("mist") || kind.includes("fog") || kind.includes("haze")) {
+    return `
+      ${cloud}
+      <use xlink:href="#mist" class="mist-lines" x="5" y="35"></use>
+    `;
+  }
+  if (kind.includes("cloud")) {
+    return darkCloud;
+  }
+  if (isNight) {
+    return `
+      <use xlink:href="#moon" x="-15"></use>
+      <use xlink:href="#star" x="42" y="30" class="stars"></use>
+      <use xlink:href="#star" x="61" y="32" class="stars"></use>
+      <use xlink:href="#star" x="55" y="50" class="stars"></use>
+    `;
+  }
+  return `<use xlink:href="#sun"></use>`;
+};
+
 const renderForecast = (days) => {
   forecastEl.innerHTML = "";
   if (!days.length) {
@@ -71,86 +147,16 @@ const renderForecast = (days) => {
     const minTemp =
       typeof day.temp?.min === "number" ? Math.round(day.temp.min) : null;
 
-    // `main` is upstream data; classList.add throws on whitespace or empty
-    // strings, which would abort the whole render. Padding days get a neutral
-    // class instead of being styled as a confident sunny forecast.
+    // Padding days beyond the forecast horizon are dimmed rather than shown
+    // as a confident prediction.
     if (day.placeholder) {
       tile.classList.add("forecast-tile--empty");
-    } else {
-      const mainClass = main.toLowerCase().replace(/[^a-z]/g, "") || "clear";
-      tile.classList.add(`weather-${mainClass}`);
     }
 
-    const iconMarkup = (() => {
-      const cloud = `
-        <use xlink:href="#grayCloud" class="small-cloud" fill="url(#gradGray)"></use>
-        <use xlink:href="#whiteCloud" x="7"></use>
-      `;
-      const darkCloud = `
-        <use xlink:href="#grayCloud" class="small-cloud" fill="url(#gradGray)"></use>
-        <use xlink:href="#grayCloud" x="25" y="10" class="reverse-small-cloud" fill="url(#gradDarkGray)"></use>
-        <use xlink:href="#whiteCloud" x="7"></use>
-      `;
-      if (main.toLowerCase().includes("thunder")) {
-        return `
-          ${isNight ? `<use xlink:href="#moon" x="-20" y="-15"></use>` : `<use xlink:href="#sun" x="-12" y="-18"></use>`}
-          ${cloud}
-          <use xlink:href="#thunderBolt" x="52" y="55"></use>
-          <use xlink:href="#rainDrop" class="drop1" x="25" y="65"></use>
-          <use xlink:href="#rainDrop" class="drop3" x="45" y="65"></use>
-        `;
-      }
-      if (main.toLowerCase().includes("drizzle")) {
-        return `
-          ${isNight ? `<use xlink:href="#moon" x="-20" y="-15"></use>` : `<use xlink:href="#sun" x="-12" y="-18"></use>`}
-          ${cloud}
-          <use xlink:href="#rainDrizzle" class="rain-drizzle" x="25" y="65"></use>
-          <use xlink:href="#rainDrizzle" class="rain-drizzle" x="40" y="65"></use>
-        `;
-      }
-      if (main.toLowerCase().includes("rain")) {
-        return `
-          ${isNight ? `<use xlink:href="#moon" x="-20" y="-15"></use>` : `<use xlink:href="#sun" x="-12" y="-18"></use>`}
-          ${cloud}
-          <use xlink:href="#rainDrop" class="drop1" x="25" y="65"></use>
-          <use xlink:href="#rainDrop" class="drop3" x="45" y="65"></use>
-        `;
-      }
-      if (main.toLowerCase().includes("snow")) {
-        return `
-          ${isNight ? `<use xlink:href="#moon" x="-20" y="-15"></use>` : `<use xlink:href="#sun" x="-12" y="-18"></use>`}
-          ${cloud}
-          <use xlink:href="#snowFlake" class="snowflake2" x="30" y="65"></use>
-          <use xlink:href="#snowFlake" class="snowflake4" x="45" y="65"></use>
-          <use xlink:href="#snowFlake" class="snowflake5" x="58" y="65"></use>
-        `;
-      }
-      if (
-        main.toLowerCase().includes("mist") ||
-        main.toLowerCase().includes("fog") ||
-        main.toLowerCase().includes("haze")
-      ) {
-        return `
-          ${cloud}
-          <use xlink:href="#mist" class="mist-lines" x="5" y="35"></use>
-        `;
-      }
-      if (main.toLowerCase().includes("cloud")) {
-        return darkCloud;
-      }
-      if (isNight) {
-        return `
-          <use xlink:href="#moon" x="-15"></use>
-          <use xlink:href="#star" x="42" y="30" class="stars"></use>
-          <use xlink:href="#star" x="61" y="32" class="stars"></use>
-          <use xlink:href="#star" x="55" y="50" class="stars"></use>
-        `;
-      }
-      return `<use xlink:href="#sun"></use>`;
-    })();
+    const iconMarkup = iconMarkupFor(main, isNight);
 
-    // iconMarkup is built from string literals only; day/desc come from the
-    // upstream API and are set as text afterwards rather than interpolated.
+    // day/desc come from the upstream API and are set as text afterwards
+    // rather than interpolated into this markup.
     tile.innerHTML = `
       <strong></strong>
       <svg class="forecast-icon" viewBox="0 0 100 100">
@@ -170,11 +176,31 @@ const renderForecast = (days) => {
   });
 };
 
+// The hero shows today's high and low with a matching icon. The current
+// endpoint only carries wind, so today's entry from the daily summary is the
+// source — the same data the first forecast tile uses.
+const renderHero = (today) => {
+  const max = typeof today?.temp?.max === "number" ? Math.round(today.temp.max) : null;
+  const min = typeof today?.temp?.min === "number" ? Math.round(today.temp.min) : null;
+  todayMax.textContent = max !== null ? `${max}°` : "--";
+  todayMin.textContent = min !== null ? `${min}°` : "";
+
+  const main = today?.weather?.[0]?.main || "";
+  const icon = today?.weather?.[0]?.icon;
+  currentIcon.innerHTML = iconMarkupFor(main, icon ? icon.endsWith("n") : false);
+  currentIcon.setAttribute(
+    "aria-label",
+    today?.weather?.[0]?.description || "Current conditions"
+  );
+};
+
 const updateUI = (data) => {
   locationName.textContent = data.location.name;
   latEl.textContent = formatCoord(data.location.lat);
   lonEl.textContent = formatCoord(data.location.lon);
   countryEl.textContent = data.location.country;
+
+  renderHero(data.daily?.[0]);
 
   const deg = data.current.wind_deg;
   windDir.textContent = Number.isFinite(deg)
@@ -186,7 +212,7 @@ const updateUI = (data) => {
 
   updatedAt.textContent = `Updated ${new Date(
     data.current.dt * 1000
-  ).toLocaleString()}`;
+  ).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
 
   renderForecast(data.daily);
 
@@ -372,6 +398,17 @@ form.addEventListener("submit", (event) => {
   const formData = new FormData(form);
   refresh(formData.get("city"), formData.get("country"));
 });
+
+// A wall display should show the time. Ticks every 10s rather than every
+// second: the readout has no seconds, so a faster timer only wastes wakeups.
+const tickClock = () => {
+  clockEl.textContent = new Date().toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+};
+tickClock();
+setInterval(tickClock, 10000);
 
 // This is an always-on wall display: without a timer it would show the load
 // time snapshot forever while "Updated …" keeps aging.
